@@ -1,0 +1,37 @@
+P/N,Description,Location,Quantity
+31477,Enh detector,R1-A-1,1
+31459,pcbt-flamingo main board,R1-A-2,1
+31460,main board,R1-A-3,1
+31461,main board,R1-B-1,1
+31462,main board,R1-B-2,1
+31463,main board,R1-B-3,1
+31465,main board,R1-C-1,1
+31466,enh detector harness,R1-C-2,2
+31472,enh detector harness Nir,R1-C-3,2
+31474,single peltier resistor,R1-D-1,10
+31476,common source assy,R1-D-2,7
+31480,Kbr Window-parylene,R1-D-3,10
+31708,pcb flamingo gui display,R2-A-1,4
+31715,Mir Tgs Pre-amp assy,R2-A-2,3
+31719,pcb-flamingo main board,R2-A-3,1
+31722,pcbt flamingo main board,R2-B-1,1
+31724,pcbt flamingo main board,R2-B-2,1
+31726,Hene box-flamingo PSU,R2-B-3,3
+31727,hene bracket-flamingi PSu,R2-C-1,1
+31728,Jstop assy,R2-C-2,2
+31733,turret window,R2-C-3,3
+31734,Display LCD,R2-D-1,3
+31735,turret Moulding,R2-D-2,1
+31736,Turret Window,R2-D-3,3
+31737,Display LCD,R3-A-1,2
+31739,Peripheral drive pcb,R3-A-2,2
+31741,Cable assy-flamingo display,R3-A-3,1
+31748,Enh detector change over,R3-B-1,3
+31749,Output Flat flipper motor,R3-B-2,4
+31752,enh Mfb plugin Pcb,R3-B-3,1
+31756,Enh Mfb plugin pcb,R3-C-1,1
+31757,Jstop assy,R3-C-2,1
+31753,Mct preamp,R3-D-2,1
+31755,Jstop support optica,R3-D-3,1
+31758,enhand mfb pcb,R4-A-1,1
+31762,Det mirror support,R4-A-2,1
