@@ -1,25 +1,105 @@
 import streamlit as st
 import pandas as pd
 
-# Konfigurasi Halaman
-st.set_page_config(page_title="Sistem Inventori Rak", page_icon="📦", layout="wide")
+# Konfigurasi Halaman & Tema
+st.set_page_config(
+    page_title="Sistem Pengurusan Inventori Rak",
+    page_icon="📦",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.title("📦 Sistem Carian & Lokasi Inventori Rak")
+# Custom CSS untuk Rekaan Moden & Profesional
+st.markdown("""
+    <style>
+    /* Styling Kad Utama */
+    .metric-card {
+        background-color: #1e222d;
+        border: 1px solid #2e364f;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    .metric-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #4da6ff;
+    }
+    .metric-label {
+        font-size: 14px;
+        color: #a0aec0;
+    }
+    
+    /* Styling Badge Status Stok */
+    .badge-ok {
+        background-color: #1c4532;
+        color: #68d391;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .badge-low {
+        background-color: #742a2a;
+        color: #feb2b2;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .location-tag {
+        background-color: #2b6cb0;
+        color: #ffffff;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# Fungsi Muat Data
+# Fungsi Muat Data Pangkalan
 @st.cache_data(ttl=2)
 def load_data():
     try:
-        return pd.read_csv("data.csv", dtype={"P/N": str})
+        df = pd.read_csv("data.csv", dtype={"P/N": str})
+        df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce').fillna(0).astype(int)
+        return df
     except Exception:
         return pd.DataFrame(columns=["P/N", "Description", "Location", "Quantity"])
 
 df = load_data()
 
-# Ruang Carian Utama
-search = st.text_input("🔍 Taip Part Number (P/N), Description, atau Lokasi Rak (cth: R1-A-1):", "")
+# Header Utama
+st.title("📦 Sistem Pengurusan Inventori Rak")
+st.caption("Pangkalan Data Carian, Kawalan Stok, & Lokasi Rak Barangan")
 
-# Filter Data
+# 📊 Dashboard Ringkasan (Metrics)
+m1, m2, m3, m4 = st.columns(4)
+
+total_pn = len(df)
+total_qty = int(df["Quantity"].sum()) if not df.empty else 0
+low_stock_count = len(df[df['Quantity'] <= 2]) if not df.empty else 0
+total_locations = df['Location'].nunique() if not df.empty else 0
+
+m1.markdown(f'<div class="metric-card"><div class="metric-value">{total_pn}</div><div class="metric-label">Total P/N Berdaftar</div></div>', unsafe_allow_html=True)
+m2.markdown(f'<div class="metric-card"><div class="metric-value">{total_qty}</div><div class="metric-label">Jumlah Unit Stok</div></div>', unsafe_allow_html=True)
+m3.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #feb2b2;">{low_stock_count}</div><div class="metric-label">Item Stok Rendah (≤2)</div></div>', unsafe_allow_html=True)
+m4.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #68d391;">{total_locations}</div><div class="metric-label">Jumlah Lokasi Rak</div></div>', unsafe_allow_html=True)
+
+st.divider()
+
+# 🔍 Carian dan Penapis (Filters)
+col_search, col_view = st.columns([3, 1])
+
+with col_search:
+    search = st.text_input("🔍 Carian Pantas", placeholder="Taip Part Number (P/N), Description, atau Lokasi (cth: R1-A-1)...")
+
+with col_view:
+    view_type = st.radio("Mod Paparan:", ["Jadual (Table)", "Kad (Cards)"], horizontal=True)
+
+# Tapis Data
 if search:
     mask = (
         df['P/N'].astype(str).str.contains(search, case=False, na=False) |
@@ -30,64 +110,95 @@ if search:
 else:
     filtered_df = df
 
-# Dashboard KPI Ringkas
-c1, c2, c3 = st.columns(3)
-c1.metric("Total P/N Registered", len(df))
-c2.metric("Jumlah Unit Stok", int(df["Quantity"].sum()) if not df.empty else 0)
-c3.metric("Item Dijumpai", len(filtered_df))
+# 📋 Paparan Data
+st.subheader(f"Senarai Barang ({len(filtered_df)} dijumpai)")
 
-st.divider()
-
-# Paparan Senarai Barang
 if not filtered_df.empty:
-    for idx, row in filtered_df.iterrows():
-        with st.container():
-            col1, col2, col3, col4 = st.columns([2, 4, 2, 2])
-            col1.markdown(f"**P/N:** `{row['P/N']}`")
-            col2.write(f"**Description:** {row['Description']}")
-            col3.markdown(f"**Lokasi Rak:** 📍 `{row['Location']}`")
-            col4.write(f"**Kuantiti:** {row['Quantity']} unit")
-            st.divider()
+    if view_type == "Jadual (Table)":
+        # Formatkan Jadual Interaktif
+        display_df = filtered_df.copy()
+        display_df['Status'] = display_df['Quantity'].apply(lambda x: "⚠️ Stok Rendah" if x <= 2 else "✅ Mencukupi")
+        
+        st.dataframe(
+            display_df[['P/N', 'Description', 'Location', 'Quantity', 'Status']],
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "P/N": st.column_config.TextColumn("Part Number (P/N)", help="Kod unik komponen"),
+                "Description": st.column_config.TextColumn("Nama / Perincian Item"),
+                "Location": st.column_config.TextColumn("Lokasi Rak"),
+                "Quantity": st.column_config.NumberColumn("Kuantiti (Unit)", format="%d"),
+                "Status": st.column_config.TextColumn("Status Stok")
+            }
+        )
+    else:
+        # Format Kad Visual
+        for idx, row in filtered_df.iterrows():
+            with st.container():
+                c1, c2, c3, c4 = st.columns([2, 4, 2, 2])
+                c1.markdown(f"**P/N:** `{row['P/N']}`")
+                c2.write(f"**Description:** {row['Description']}")
+                c3.markdown(f"**Rak:** <span class='location-tag'>📍 {row['Location']}</span>", unsafe_allow_html=True)
+                
+                status_badge = "<span class='badge-low'>⚠️ Stok Rendah</span>" if row['Quantity'] <= 2 else "<span class='badge-ok'>✅ Mencukupi</span>"
+                c4.markdown(f"**Qty:** `{row['Quantity']} unit` &nbsp; {status_badge}", unsafe_allow_html=True)
+                st.divider()
 else:
-    st.warning("⚠️ Tiada barang dijumpai mengikut carian tersebut.")
+    st.warning("⚠️ Tiada maklumat rekod dijumpai.")
 
-# Sidebar untuk Tambah / Kemaskini / Padam
+# ⚙️ SIDEBAR (Pengurusan & Kawalan)
 with st.sidebar:
-    tab1, tab2 = st.tabs(["➕ Tambah / Edit", "🗑️ Padam Item"])
+    st.header("⚙️ Panel Kawalan")
+    tab1, tab2, tab3 = st.tabs(["➕ Kemaskini", "🗑️ Padam", "📥 Muat Turun"])
     
+    # TAB 1: Tambah / Edit
     with tab1:
-        st.header("⚙️ Tambah / Kemaskini")
+        st.caption("Masukkan P/N sedia ada untuk kemaskini, atau P/N baru untuk tambah.")
         pn = st.text_input("Part Number (P/N)")
         desc = st.text_input("Description")
-        loc = st.text_input("Kod Lokasi Rak (cth: R2-B-1)")
+        loc = st.text_input("Lokasi Rak (cth: R2-B-1)")
         qty = st.number_input("Kuantiti (Qty)", min_value=0, value=1)
         
-        if st.button("Simpan Data"):
+        if st.button("💾 Simpan / Update Data", use_container_width=True):
             if pn and loc:
-                if pn in df['P/N'].astype(str).values:
-                    df.loc[df['P/N'].astype(str) == pn, ['Description', 'Location', 'Quantity']] = [desc, loc, qty]
+                pn_clean = str(pn).strip()
+                if pn_clean in df['P/N'].astype(str).values:
+                    df.loc[df['P/N'].astype(str) == pn_clean, ['Description', 'Location', 'Quantity']] = [desc, loc, qty]
+                    st.toast(f"P/N {pn_clean} berjaya dikemaskini!", icon="🔄")
                 else:
-                    new_row = pd.DataFrame([{"P/N": str(pn), "Description": desc, "Location": loc, "Quantity": qty}])
+                    new_row = pd.DataFrame([{"P/N": pn_clean, "Description": desc, "Location": loc, "Quantity": qty}])
                     df = pd.concat([df, new_row], ignore_index=True)
+                    st.toast(f"P/N {pn_clean} baru ditambah!", icon="✅")
                 
                 df.to_csv("data.csv", index=False)
-                st.success(f"Data P/N {pn} berjaya disimpan!")
                 st.rerun()
             else:
                 st.error("Sila pastikan P/N dan Lokasi diisi.")
 
+    # TAB 2: Padam Item
     with tab2:
-        st.header("🗑️ Padam P/N")
+        st.caption("Pilih item untuk dipadam secara kekal.")
         if not df.empty:
-            # Pilihan dropdown P/N & Description
             options = df.apply(lambda r: f"{r['P/N']} - {r['Description']}", axis=1).tolist()
-            selected_option = st.selectbox("Pilih item untuk dipadam:", options)
+            selected_option = st.selectbox("Pilih item:", options)
             
-            if st.button("🚨 Padam Item Ini", type="primary"):
+            if st.button("🗑️ Padam Item Ini", type="primary", use_container_width=True):
                 selected_pn = selected_option.split(" - ")[0]
                 df = df[df['P/N'].astype(str) != str(selected_pn)]
                 df.to_csv("data.csv", index=False)
-                st.success(f"P/N {selected_pn} berjaya dipadam!")
+                st.toast(f"P/N {selected_pn} dipadam!", icon="🗑️")
                 st.rerun()
         else:
             st.info("Tiada data stok.")
+
+    # TAB 3: Eksport Data
+    with tab3:
+        st.caption("Muat turun pangkalan data inventori terkini dalam format CSV.")
+        csv_data = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Muat Turun CSV",
+            data=csv_data,
+            file_name="inventori_rak_terkini.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
