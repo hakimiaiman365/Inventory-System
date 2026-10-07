@@ -75,7 +75,21 @@ df = load_data()
 st.title("📦 Sistem Pengurusan Inventori Rak")
 st.caption("Pangkalan Data Carian, Kawalan Stok, & Lokasi Rak Barangan")
 
-# 📊 Dashboard Ringkasan (Metrics)
+# 🔍 1. RUANG CARIAN UTAMA (PALING ATAS)
+col_search, col_filter, col_view = st.columns([3, 2, 2])
+
+with col_search:
+    search = st.text_input("🔍 Carian Pantas (P/N, Description, Lokasi)", placeholder="Taip P/N, nama barang, atau lokasi rak...")
+
+with col_filter:
+    filter_low_stock = st.checkbox("⚠️ Papar Stok Rendah Sahaja (≤ 50 unit)")
+
+with col_view:
+    view_type = st.radio("Mod Paparan:", ["Jadual (Table)", "Kad (Cards)"], horizontal=True)
+
+st.divider()
+
+# 📊 2. DASHBOARD RINGKASAN (METRICS)
 m1, m2, m3, m4 = st.columns(4)
 
 total_pn = len(df)
@@ -89,9 +103,7 @@ m2.markdown(f'<div class="metric-card"><div class="metric-value">{total_qty}</di
 m3.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #feb2b2;">{low_stock_count}</div><div class="metric-label">Item Stok Rendah (≤50)</div></div>', unsafe_allow_html=True)
 m4.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #68d391;">{total_locations}</div><div class="metric-label">Jumlah Lokasi Rak</div></div>', unsafe_allow_html=True)
 
-st.divider()
-
-# ⚠️ Ruang Khas: Tekan Untuk Lihat Senarai Stok Rendah
+# 🔴 3. SENARAI PANTAS ITEM STOK RENDAH
 with st.expander(f"🔴 Tekan Sini Untuk Lihat Senarai P/N Stok Rendah ≤ 50 Unit ({low_stock_count} item)", expanded=False):
     if not low_stock_df.empty:
         st.dataframe(
@@ -110,18 +122,6 @@ with st.expander(f"🔴 Tekan Sini Untuk Lihat Senarai P/N Stok Rendah ≤ 50 Un
 
 st.divider()
 
-# 🔍 Carian dan Penapis (Filters)
-col_search, col_filter, col_view = st.columns([3, 2, 2])
-
-with col_search:
-    search = st.text_input("🔍 Carian Pantas", placeholder="Taip P/N, Description, atau Lokasi...")
-
-with col_filter:
-    filter_low_stock = st.checkbox("⚠️ Papar Stok Rendah Sahaja (≤ 50 unit)")
-
-with col_view:
-    view_type = st.radio("Mod Paparan:", ["Jadual (Table)", "Kad (Cards)"], horizontal=True)
-
 # Tapis Data Mengikut Carian dan Checkbox
 filtered_df = df.copy()
 
@@ -136,7 +136,7 @@ if search:
 if filter_low_stock:
     filtered_df = filtered_df[filtered_df['Quantity'] <= 50]
 
-# 📋 Paparan Data Utama
+# 📋 4. PAPARAN DATA UTAMA
 st.subheader(f"Senarai Barang ({len(filtered_df)} dijumpai)")
 
 if not filtered_df.empty:
