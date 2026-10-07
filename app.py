@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Konfigurasi Halaman & Tema
+# Konfigurasi Halaman
 st.set_page_config(
     page_title="Sistem Pengurusan Inventori Rak",
     page_icon="📦",
@@ -9,52 +9,95 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS untuk Rekaan Moden & Profesional
+# 🎨 Custom CSS Mengikut Rekaan UI Gambar (Oren & Clean Light Theme)
 st.markdown("""
     <style>
-    /* Styling Kad Utama */
-    .metric-card {
-        background-color: #1e222d;
-        border: 1px solid #2e364f;
-        border-radius: 12px;
-        padding: 16px;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-    .metric-value {
-        font-size: 28px;
-        font-weight: bold;
-        color: #4da6ff;
-    }
-    .metric-label {
-        font-size: 14px;
-        color: #a0aec0;
+    /* Latar Belakang & Fon Utama */
+    .stApp {
+        background-color: #F8F9FD;
     }
     
-    /* Styling Badge Status Stok */
-    .badge-ok {
-        background-color: #1c4532;
-        color: #68d391;
-        padding: 4px 10px;
+    /* Banner Gradient Oren Utama (Macam Kad Atas Gambar) */
+    .hero-banner {
+        background: linear-gradient(135deg, #FF6B00 0%, #FF9E00 100%);
+        border-radius: 20px;
+        padding: 22px 28px;
+        color: white;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 25px rgba(255, 107, 0, 0.25);
+    }
+    .hero-label {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+    .hero-val {
+        font-size: 38px;
+        font-weight: 800;
+        margin: 4px 0;
+    }
+    .hero-badge {
+        background: rgba(255, 255, 255, 0.25);
+        padding: 4px 12px;
         border-radius: 20px;
         font-size: 12px;
-        font-weight: bold;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    /* Kad Metrik Statistik (Gaya Kad Rounded & Shadow) */
+    .metric-card-modern {
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        border: 1px solid #F0F2F6;
+        margin-bottom: 15px;
+    }
+    .metric-card-title {
+        font-size: 13px;
+        color: #8C8C8C;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .metric-card-value {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1E2022;
+    }
+    
+    /* Badges Status Stok */
+    .badge-ok {
+        background-color: #E6F7ED;
+        color: #00A854;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
     }
     .badge-low {
-        background-color: #742a2a;
-        color: #feb2b2;
-        padding: 4px 10px;
-        border-radius: 20px;
+        background-color: #FFE6E6;
+        color: #E60000;
+        padding: 4px 12px;
+        border-radius: 12px;
         font-size: 12px;
-        font-weight: bold;
+        font-weight: 700;
     }
     .location-tag {
-        background-color: #2b6cb0;
-        color: #ffffff;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 600;
+        background-color: #FFF0E6;
+        color: #FF6B00;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* Penyesuaian Butang & Input */
+    .stButton>button {
+        border-radius: 12px !important;
+        font-weight: 600 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -71,40 +114,72 @@ def load_data():
 
 df = load_data()
 
-# Header Utama
-st.title("📦 Sistem Pengurusan Inventori Rak")
-st.caption("Pangkalan Data Carian, Kawalan Stok, & Lokasi Rak Barangan")
-
 # 🔍 1. RUANG CARIAN UTAMA (PALING ATAS)
+st.title("📦 Inventori Rak")
+
 col_search, col_filter, col_view = st.columns([3, 2, 2])
 
 with col_search:
-    search = st.text_input("🔍 Carian Pantas (P/N, Description, Lokasi)", placeholder="Taip P/N, nama barang, atau lokasi rak...")
+    search = st.text_input("🔍 Carian Pantas", placeholder="Taip P/N, nama barang, atau lokasi rak...", label_visibility="collapsed")
 
 with col_filter:
-    filter_low_stock = st.checkbox("⚠️ Papar Stok Rendah Sahaja (≤ 50 unit)")
+    filter_low_stock = st.checkbox("⚠️ Stok Rendah Sahaja (≤ 50)")
 
 with col_view:
-    view_type = st.radio("Mod Paparan:", ["Jadual (Table)", "Kad (Cards)"], horizontal=True)
+    view_type = st.radio("Mod Paparan:", ["Jadual (Table)", "Kad (Cards)"], horizontal=True, label_visibility="collapsed")
 
-st.divider()
+st.markdown("<br>", unsafe_allow_html=True)
 
-# 📊 2. DASHBOARD RINGKASAN (METRICS)
-m1, m2, m3, m4 = st.columns(4)
-
+# Kiraan Statistik
 total_pn = len(df)
 total_qty = int(df["Quantity"].sum()) if not df.empty else 0
 low_stock_df = df[df['Quantity'] <= 50] if not df.empty else pd.DataFrame()
 low_stock_count = len(low_stock_df)
 total_locations = df['Location'].nunique() if not df.empty else 0
 
-m1.markdown(f'<div class="metric-card"><div class="metric-value">{total_pn}</div><div class="metric-label">Total P/N Berdaftar</div></div>', unsafe_allow_html=True)
-m2.markdown(f'<div class="metric-card"><div class="metric-value">{total_qty}</div><div class="metric-label">Jumlah Unit Stok</div></div>', unsafe_allow_html=True)
-m3.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #feb2b2;">{low_stock_count}</div><div class="metric-label">Item Stok Rendah (≤50)</div></div>', unsafe_allow_html=True)
-m4.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #68d391;">{total_locations}</div><div class="metric-label">Jumlah Lokasi Rak</div></div>', unsafe_allow_html=True)
+# 📊 2. DASHBOARD BANNER & KAD METRIK (GAYA UI GAMBAR)
+col_banner, col_metrics = st.columns([1.2, 2])
+
+with col_banner:
+    # Banner Gradient Oren (Macam skrin tengah gambar)
+    st.markdown(f"""
+        <div class="hero-banner">
+            <div class="hero-label">Jumlah Kuantiti Stok</div>
+            <div class="hero-val">{total_qty:,} <span style="font-size: 18px; font-weight: normal;">unit</span></div>
+            <div class="hero-badge">📦 {total_pn} Part Number Berdaftar</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_metrics:
+    # Kad-kad Metrik Ringkas
+    m1, m2, m3 = st.columns(3)
+    
+    with m1:
+        st.markdown(f"""
+            <div class="metric-card-modern">
+                <div class="metric-card-title">Total P/N</div>
+                <div class="metric-card-value">{total_pn}</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    with m2:
+        st.markdown(f"""
+            <div class="metric-card-modern">
+                <div class="metric-card-title">Stok Rendah (≤50)</div>
+                <div class="metric-card-value" style="color: #E60000;">{low_stock_count}</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    with m3:
+        st.markdown(f"""
+            <div class="metric-card-modern">
+                <div class="metric-card-title">Lokasi Rak</div>
+                <div class="metric-card-value" style="color: #FF6B00;">{total_locations}</div>
+            </div>
+        """, unsafe_allow_html=True)
 
 # 🔴 3. SENARAI PANTAS ITEM STOK RENDAH
-with st.expander(f"🔴 Tekan Sini Untuk Lihat Senarai P/N Stok Rendah ≤ 50 Unit ({low_stock_count} item)", expanded=False):
+with st.expander(f"🔴 Tekan Sini Untuk Senarai P/N Stok Rendah ≤ 50 Unit ({low_stock_count} item)", expanded=False):
     if not low_stock_df.empty:
         st.dataframe(
             low_stock_df[['P/N', 'Description', 'Location', 'Quantity']],
@@ -183,7 +258,7 @@ with st.sidebar:
         loc = st.text_input("Lokasi Rak (cth: R2-B-1)")
         qty = st.number_input("Kuantiti (Qty)", min_value=0, value=1)
         
-        if st.button("💾 Simpan / Update Data", use_container_width=True):
+        if st.button("💾 Simpan / Update Data", use_container_width=True, type="primary"):
             if pn and loc:
                 pn_clean = str(pn).strip()
                 if pn_clean in df['P/N'].astype(str).values:
