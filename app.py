@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Konfigurasi Halaman & Tema Dark
+# 1. Konfigurasi Halaman & Tema
 st.set_page_config(
     page_title="Inventori Rak - Sistem Stok & Lokasi",
     page_icon="📦",
@@ -9,42 +9,56 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS Dark Cyberpunk dengan Segmented Box Button
-st.markdown("""
+# 2. Custom CSS UI Dark Neon Cyberpunk
+st.markdown('''
     <style>
-    /* Latar Belakang & Fon Utama */
+    /* Body & Background */
     .stApp {
-        background-color: #0B0E17 !important;
+        background-color: #0A0D16 !important;
         color: #E2E8F0 !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    
-    /* Header Box */
-    .header-box {
+
+    /* Container Padding */
+    .block-container {
+        padding-top: 1.2rem !important;
+        padding-bottom: 4rem !important;
+        max-width: 800px !important;
+    }
+
+    /* Top Header Bar */
+    .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    .header-left {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 15px;
     }
-    .header-title {
-        font-size: 26px;
+    .header-title-text {
+        font-size: 24px;
         font-weight: 800;
         color: #FFFFFF;
         line-height: 1.1;
     }
-    .header-subtitle {
+    .header-sub-text {
         font-size: 12px;
         color: #94A3B8;
         font-weight: 500;
     }
 
-    /* Hero Banner Gradient Oren-Pink */
-    .hero-banner {
-        background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%);
-        border-radius: 18px;
+    /* Hero Card (Jumlah Kuantiti Stok) */
+    .hero-card {
+        background: linear-gradient(135deg, #FF5E00 0%, #D9006C 100%);
+        border-radius: 20px;
         padding: 22px 24px;
         color: #FFFFFF !important;
-        box-shadow: 0 10px 25px rgba(255, 94, 0, 0.3);
+        box-shadow: 0 10px 25px rgba(255, 94, 0, 0.35);
         margin-bottom: 16px;
+        position: relative;
     }
     .hero-label {
         font-size: 11px;
@@ -54,8 +68,8 @@ st.markdown("""
         font-weight: 700;
         color: #FFFFFF !important;
     }
-    .hero-val {
-        font-size: 38px;
+    .hero-qty {
+        font-size: 40px;
         font-weight: 900;
         margin: 2px 0;
         color: #FFFFFF !important;
@@ -71,77 +85,51 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
-    /* Kad Metrik Dark Neon */
-    .metric-card-dark {
-        background: #121726;
+    /* Metric Cards (Stacked Dark Cards) */
+    .dark-metric-card {
+        background-color: #121726;
         border: 1px solid #1E293B;
-        border-radius: 16px;
+        border-radius: 18px;
         padding: 16px 20px;
         margin-bottom: 12px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
     }
-    .metric-title {
+    .metric-info-title {
         font-size: 12px;
         color: #94A3B8;
         font-weight: 600;
         margin-bottom: 4px;
     }
-    .metric-num {
+    .metric-info-val {
         font-size: 26px;
         font-weight: 800;
         color: #FFFFFF;
     }
 
-    /* Action Badges */
-    .btn-pill-red {
+    /* Pill Badges inside Metrics */
+    .pill-red {
         background: rgba(239, 68, 68, 0.2);
         color: #EF4444;
         border: 1px solid rgba(239, 68, 68, 0.4);
-        padding: 4px 12px;
+        padding: 5px 14px;
         border-radius: 20px;
         font-size: 11px;
         font-weight: 700;
     }
-    .btn-pill-purple {
+    .pill-purple {
         background: rgba(124, 58, 237, 0.2);
         color: #A78BFA;
         border: 1px solid rgba(124, 58, 237, 0.4);
-        padding: 4px 12px;
+        padding: 5px 14px;
         border-radius: 20px;
         font-size: 11px;
         font-weight: 700;
     }
 
-    /* Badges Status Stok */
-    .badge-ok {
-        background: #064E3B;
-        color: #34D399;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 800;
-    }
-    .badge-sederhana {
-        background: #78350F;
-        color: #FBBF24;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 800;
-    }
-    .badge-rendah {
-        background: #7F1D1D;
-        color: #FCA5A5;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 800;
-    }
-
-    /* KOTAK MOD PAPARAN PROFESIONAL */
+    /* Custom Radio Box Buttons (Menukar Radio Jadi Butang Kotak) */
     div[data-testid="stRadio"] > label {
         display: none !important;
     }
@@ -149,7 +137,7 @@ st.markdown("""
         display: flex !important;
         background-color: #121726 !important;
         padding: 5px !important;
-        border-radius: 14px !important;
+        border-radius: 16px !important;
         border: 1px solid #1E293B !important;
         gap: 6px !important;
         width: 100% !important;
@@ -158,14 +146,13 @@ st.markdown("""
         flex: 1 !important;
         text-align: center !important;
         background-color: transparent !important;
-        border-radius: 10px !important;
-        padding: 10px 14px !important;
+        border-radius: 12px !important;
+        padding: 12px 14px !important;
         margin: 0 !important;
         border: none !important;
         cursor: pointer !important;
         color: #94A3B8 !important;
-        font-weight: 600 !important;
-        transition: all 0.2s ease-in-out !important;
+        font-weight: 700 !important;
         justify-content: center !important;
     }
     div[role="radiogroup"] > label > div:first-child {
@@ -173,10 +160,70 @@ st.markdown("""
     }
     div[role="radiogroup"] > label:has(input:checked),
     div[role="radiogroup"] > label[data-checked="true"] {
-        background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%) !important;
+        background: linear-gradient(135deg, #FF5E00 0%, #FF9E00 100%) !important;
         color: #FFFFFF !important;
         font-weight: 800 !important;
         box-shadow: 0 4px 15px rgba(255, 94, 0, 0.4) !important;
+    }
+
+    /* Badges Status Stok */
+    .status-ok {
+        background-color: #064E3B;
+        color: #34D399;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-block;
+    }
+    .status-sederhana {
+        background-color: #78350F;
+        color: #FBBF24;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-block;
+    }
+    .status-rendah {
+        background-color: #7F1D1D;
+        color: #FCA5A5;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-block;
+    }
+
+    /* Custom Table Styling */
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+    }
+    .custom-table th {
+        color: #94A3B8;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 1px solid #1E293B;
+    }
+    .custom-table td {
+        background-color: #121726;
+        padding: 12px;
+        font-size: 13px;
+        color: #E2E8F0;
+    }
+    .custom-table tr td:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+        color: #94A3B8;
+    }
+    .custom-table tr td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
     }
 
     /* Sidebar Styling */
@@ -192,18 +239,24 @@ st.markdown("""
         margin-top: 20px;
     }
 
-    /* Styling Butang Simpan/Update */
+    /* Styling Input & Buttons */
+    .stTextInput input {
+        background-color: #121726 !important;
+        color: #FFFFFF !important;
+        border: 1px solid #1E293B !important;
+        border-radius: 14px !important;
+    }
     .stButton>button {
         border-radius: 12px !important;
-        background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%) !important;
+        background: linear-gradient(135deg, #FF5E00 0%, #D9006C 100%) !important;
         color: white !important;
         border: none !important;
         font-weight: 700 !important;
     }
     </style>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
-# 1. Fungsi Muat Data Pangkalan Asal (data.csv)
+# 3. Fungsi Muat Data Pangkalan Asal (data.csv)
 @st.cache_data(ttl=2)
 def load_data():
     try:
@@ -215,23 +268,30 @@ def load_data():
 
 df = load_data()
 
-# 2. Header Utama
-st.markdown("""
-    <div class="header-box">
-        <span style="font-size: 34px;">📦</span>
-        <div>
-            <div class="header-title">Inventori Rak</div>
-            <div class="header-subtitle">Sistem Stok & Lokasi</div>
+# 4. Header Utama App
+st.markdown('''
+    <div class="app-header">
+        <div class="header-left">
+            <span style="font-size: 32px;">📦</span>
+            <div>
+                <div class="header-title-text">Inventori Rak</div>
+                <div class="header-sub-text">Sistem Stok & Lokasi</div>
+            </div>
         </div>
+        <div style="font-size: 20px;">👤</div>
     </div>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
-# 3. Ruang Carian & Penapis
-search_query = st.text_input("🔍 Carian", placeholder="Taip P/N, nama barang, atau lokasi rak...", label_visibility="collapsed")
+# 5. Carian Utama (Paling Atas)
+search_query = st.text_input(
+    "🔍 Carian Utama", 
+    placeholder="Taip P/N, nama barang, atau lokasi rak...", 
+    label_visibility="collapsed"
+)
 
 filter_low_stock = st.checkbox("⚠️ Stok Rendah Sahaja (≤ 50)")
 
-# Mod Paparan Kotak Button (Jadual vs Kad)
+# Mod Paparan Switcher (Jadual vs Kad)
 view_mode = st.radio(
     "Mod Paparan", 
     ["📋 Jadual (Table)", "🔲 Kad (Cards)"], 
@@ -239,63 +299,54 @@ view_mode = st.radio(
     label_visibility="collapsed"
 )
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.write("")
 
-# Kiraan Statistik Data Asal
+# Kiraan Statistik Data
 total_pn = len(df)
 total_qty = int(df["Quantity"].sum()) if not df.empty else 0
 low_stock_df = df[df['Quantity'] <= 50] if not df.empty else pd.DataFrame()
 low_stock_count = len(low_stock_df)
 total_locations = df['Location'].nunique() if not df.empty else 0
 
-# 4. Hero Banner Utama
-st.markdown(f"""
-    <div class="hero-banner">
+# 6. Hero Card (Jumlah Kuantiti Stok)
+st.markdown(f'''
+    <div class="hero-card">
         <div class="hero-label">JUMLAH KUANTITI STOK</div>
-        <div class="hero-val">{total_qty:,} <span style="font-size: 18px; font-weight: normal;">unit</span></div>
+        <div class="hero-qty">{total_qty:,} <span style="font-size: 18px; font-weight: normal;">unit</span></div>
         <div class="hero-badge">📦 {total_pn} Part Number Berdaftar</div>
     </div>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
-# 5. Kad Metrik Ringkasan
-m1, m2, m3 = st.columns(3)
-
-with m1:
-    st.markdown(f"""
-        <div class="metric-card-dark">
-            <div>
-                <div class="metric-title">Total P/N</div>
-                <div class="metric-num">{total_pn}</div>
-            </div>
-            <span style="font-size: 22px;">📊</span>
+# 7. Stacked Metric Cards
+st.markdown(f'''
+    <div class="dark-metric-card">
+        <div>
+            <div class="metric-info-title">Total P/N</div>
+            <div class="metric-info-val">{total_pn}</div>
         </div>
-    """, unsafe_allow_html=True)
-
-with m2:
-    st.markdown(f"""
-        <div class="metric-card-dark">
-            <div>
-                <div class="metric-title">Stok Rendah (≤50)</div>
-                <div class="metric-num" style="color: #FF5E00;">{low_stock_count}</div>
-            </div>
-            <div class="btn-pill-red">Perlu Diperiksa</div>
+        <span style="font-size: 24px;">📊</span>
+    </div>
+    
+    <div class="dark-metric-card">
+        <div>
+            <div class="metric-info-title">Stok Rendah (≤50)</div>
+            <div class="metric-info-val" style="color: #FF5E00;">{low_stock_count}</div>
         </div>
-    """, unsafe_allow_html=True)
-
-with m3:
-    st.markdown(f"""
-        <div class="metric-card-dark">
-            <div>
-                <div class="metric-title">Lokasi Rak</div>
-                <div class="metric-num">{total_locations}</div>
-            </div>
-            <div class="btn-pill-purple">Lihat Semua →</div>
+        <div class="pill-red">Perlu Diperiksa</div>
+    </div>
+    
+    <div class="dark-metric-card">
+        <div>
+            <div class="metric-info-title">Lokasi Rak</div>
+            <div class="metric-info-val">{total_locations}</div>
         </div>
-    """, unsafe_allow_html=True)
+        <div class="pill-purple">Lihat Semua →</div>
+    </div>
+''', unsafe_allow_html=True)
 
 st.write("")
 
-# 6. Tapis Data Mengikut Carian
+# 8. Penapis Data
 filtered_df = df.copy()
 
 if search_query:
@@ -309,52 +360,68 @@ if search_query:
 if filter_low_stock:
     filtered_df = filtered_df[filtered_df['Quantity'] <= 50]
 
-# 7. Paparan Senarai Inventori
-st.subheader("📚 Senarai Inventori")
+# 9. Senarai Inventori
+st.markdown("### 📚 Senarai Inventori")
 
-def get_status_badge(qty):
+def get_status_html(qty):
     if qty <= 20:
-        return "<span class='badge-rendah'>Rendah</span>"
+        return "<span class='status-rendah'>Rendah</span>"
     elif qty <= 50:
-        return "<span class='badge-sederhana'>Sederhana</span>"
+        return "<span class='status-sederhana'>Sederhana</span>"
     else:
-        return "<span class='badge-ok'>OK</span>"
+        return "<span class='status-ok'>OK</span>"
 
 if not filtered_df.empty:
     if "Jadual" in view_mode:
-        display_df = filtered_df.copy()
-        display_df['Status'] = display_df['Quantity'].apply(lambda x: "Rendah" if x <= 20 else ("Sederhana" if x <= 50 else "OK"))
+        table_rows = ""
+        for i, row in filtered_df.reset_index(drop=True).iterrows():
+            status_tag = get_status_html(row['Quantity'])
+            table_rows += f'''
+                <tr>
+                    <td>{i+1}</td>
+                    <td><b>{row['P/N']}</b></td>
+                    <td>{row['Description']}</td>
+                    <td><code>{row['Location']}</code></td>
+                    <td><b>{row['Quantity']}</b></td>
+                    <td>{status_tag}</td>
+                </tr>
+            '''
         
-        st.dataframe(
-            display_df[['P/N', 'Description', 'Location', 'Quantity', 'Status']],
-            use_container_width=True,
-            hide_index=True,
-            column_config={
-                "P/N": st.column_config.TextColumn("P/N"),
-                "Description": st.column_config.TextColumn("Nama Barang"),
-                "Location": st.column_config.TextColumn("Lokasi Rak"),
-                "Quantity": st.column_config.NumberColumn("Stok", format="%d"),
-                "Status": st.column_config.TextColumn("Status")
-            }
-        )
+        st.markdown(f'''
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>P/N</th>
+                        <th>Nama Barang</th>
+                        <th>Lokasi Rak</th>
+                        <th>Stok</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table_rows}
+                </tbody>
+            </table>
+        ''', unsafe_allow_html=True)
     else:
         for idx, row in filtered_df.iterrows():
-            st.markdown(f"""
-                <div class="metric-card-dark">
+            st.markdown(f'''
+                <div class="dark-metric-card">
                     <div>
                         <div style="font-size: 16px; font-weight: 800; color: #FFF;">P/N: {row['P/N']}</div>
                         <div style="font-size: 13px; color: #94A3B8;"><b>Barang:</b> {row['Description']} | <b>Rak:</b> 📍 {row['Location']}</div>
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 16px; font-weight: 800;">{row['Quantity']} unit</div>
-                        <div style="margin-top: 4px;">{get_status_badge(row['Quantity'])}</div>
+                        <div style="margin-top: 4px;">{get_status_html(row['Quantity'])}</div>
                     </div>
                 </div>
-            """, unsafe_allow_html=True)
+            ''', unsafe_allow_html=True)
 else:
     st.warning("⚠️ Tiada maklumat rekod dijumpai.")
 
-# 8. Sidebar Panel Kawalan
+# 10. Sidebar Panel Kawalan (Tambah, Edit, Padam, Export)
 with st.sidebar:
     st.header("⚙️ Panel Kawalan")
     
@@ -406,11 +473,11 @@ with st.sidebar:
             use_container_width=True
         )
 
-    st.markdown("""
+    st.markdown('''
         <div class="sidebar-tips">
             <div style="font-weight: 700; color: #60A5FA; font-size: 13px;">💡 Tips</div>
             <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">
                 Pastikan format P/N, lokasi rak dan kuantiti adalah betul sebelum menyimpan data.
             </div>
         </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
