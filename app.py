@@ -9,37 +9,35 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 🎨 Custom CSS Mengikut Rekaan UI Gambar (Oren & Clean Light Theme)
+# 🎨 Custom CSS yang Menyokong DUA-DUA (Light Mode & Dark Mode)
 st.markdown("""
     <style>
-    /* Latar Belakang & Fon Utama */
-    .stApp {
-        background-color: #F8F9FD;
-    }
-    
-    /* Banner Gradient Oren Utama (Macam Kad Atas Gambar) */
+    /* Banner Gradient Oren Utama (Kekal Terang & Jelas dalam Semua Mod) */
     .hero-banner {
         background: linear-gradient(135deg, #FF6B00 0%, #FF9E00 100%);
         border-radius: 20px;
         padding: 22px 28px;
-        color: white;
+        color: #FFFFFF !important;
         margin-bottom: 20px;
-        box-shadow: 0 10px 25px rgba(255, 107, 0, 0.25);
+        box-shadow: 0 10px 25px rgba(255, 107, 0, 0.3);
     }
     .hero-label {
         font-size: 13px;
         text-transform: uppercase;
         letter-spacing: 1px;
-        opacity: 0.9;
+        color: #FFFFFF !important;
+        opacity: 0.95;
         font-weight: 600;
     }
     .hero-val {
         font-size: 38px;
         font-weight: 800;
+        color: #FFFFFF !important;
         margin: 4px 0;
     }
     .hero-badge {
         background: rgba(255, 255, 255, 0.25);
+        color: #FFFFFF !important;
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 12px;
@@ -47,30 +45,31 @@ st.markdown("""
         display: inline-block;
     }
 
-    /* Kad Metrik Statistik (Gaya Kad Rounded & Shadow) */
+    /* Kad Metrik Dinamik (Mengikut Tema Light / Dark Automatik) */
     .metric-card-modern {
-        background: #FFFFFF;
+        background-color: var(--secondary-background-color, #FFFFFF);
         border-radius: 16px;
         padding: 18px 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-        border: 1px solid #F0F2F6;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(128, 128, 128, 0.2);
         margin-bottom: 15px;
     }
     .metric-card-title {
         font-size: 13px;
-        color: #8C8C8C;
+        color: var(--text-color, #64748B);
+        opacity: 0.8;
         font-weight: 600;
         margin-bottom: 6px;
     }
     .metric-card-value {
         font-size: 26px;
         font-weight: 800;
-        color: #1E2022;
+        color: var(--text-color, #0F172A);
     }
     
-    /* Badges Status Stok */
+    /* Badges Status Stok (Transparent Overlay) */
     .badge-ok {
-        background-color: #E6F7ED;
+        background-color: rgba(0, 168, 84, 0.15);
         color: #00A854;
         padding: 4px 12px;
         border-radius: 12px;
@@ -78,15 +77,15 @@ st.markdown("""
         font-weight: 700;
     }
     .badge-low {
-        background-color: #FFE6E6;
-        color: #E60000;
+        background-color: rgba(230, 0, 0, 0.15);
+        color: #FF4D4D;
         padding: 4px 12px;
         border-radius: 12px;
         font-size: 12px;
         font-weight: 700;
     }
     .location-tag {
-        background-color: #FFF0E6;
+        background-color: rgba(255, 107, 0, 0.15);
         color: #FF6B00;
         padding: 4px 10px;
         border-radius: 8px;
@@ -94,7 +93,7 @@ st.markdown("""
         font-weight: 700;
     }
 
-    /* Penyesuaian Butang & Input */
+    /* Penyesuaian Butang */
     .stButton>button {
         border-radius: 12px !important;
         font-weight: 600 !important;
@@ -141,7 +140,7 @@ total_locations = df['Location'].nunique() if not df.empty else 0
 col_banner, col_metrics = st.columns([1.2, 2])
 
 with col_banner:
-    # Banner Gradient Oren (Macam skrin tengah gambar)
+    # Banner Gradient Oren
     st.markdown(f"""
         <div class="hero-banner">
             <div class="hero-label">Jumlah Kuantiti Stok</div>
@@ -151,7 +150,7 @@ with col_banner:
     """, unsafe_allow_html=True)
 
 with col_metrics:
-    # Kad-kad Metrik Ringkas
+    # Kad-kad Metrik Dinamik
     m1, m2, m3 = st.columns(3)
     
     with m1:
@@ -166,7 +165,7 @@ with col_metrics:
         st.markdown(f"""
             <div class="metric-card-modern">
                 <div class="metric-card-title">Stok Rendah (≤50)</div>
-                <div class="metric-card-value" style="color: #E60000;">{low_stock_count}</div>
+                <div class="metric-card-value" style="color: #FF4D4D;">{low_stock_count}</div>
             </div>
         """, unsafe_allow_html=True)
         
