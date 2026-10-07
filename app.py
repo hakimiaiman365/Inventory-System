@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS Dark Cyberpunk dengan Segmented Box Button (Tiada Bulatan Radio)
+# Custom CSS Dark Cyberpunk dengan Segmented Box Button
 st.markdown("""
     <style>
     /* Latar Belakang & Fon Utama */
@@ -141,7 +141,7 @@ st.markdown("""
         font-weight: 800;
     }
 
-    /* 🔲 KOTAK MOD PAPARAN PROFESIONAL (MENUKAR BULATAN RADIO JADI KOTAK BUTTON) */
+    /* KOTAK MOD PAPARAN PROFESIONAL */
     div[data-testid="stRadio"] > label {
         display: none !important;
     }
@@ -168,11 +168,9 @@ st.markdown("""
         transition: all 0.2s ease-in-out !important;
         justify-content: center !important;
     }
-    /* Sembunyikan bulatan radio */
     div[role="radiogroup"] > label > div:first-child {
         display: none !important;
     }
-    /* Kotak aktif bila dipilih */
     div[role="radiogroup"] > label:has(input:checked),
     div[role="radiogroup"] > label[data-checked="true"] {
         background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%) !important;
@@ -197,4 +195,222 @@ st.markdown("""
     /* Styling Butang Simpan/Update */
     .stButton>button {
         border-radius: 12px !important;
-        background: linear-gradient(
+        background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%) !important;
+        color: white !important;
+        border: none !important;
+        font-weight: 700 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# 1. Fungsi Muat Data Pangkalan Asal (data.csv)
+@st.cache_data(ttl=2)
+def load_data():
+    try:
+        df = pd.read_csv("data.csv", dtype={"P/N": str})
+        df['Quantity'] = pd.to_numeric(df['Quantity'], errors='coerce').fillna(0).astype(int)
+        return df
+    except Exception:
+        return pd.DataFrame(columns=["P/N", "Description", "Location", "Quantity"])
+
+df = load_data()
+
+# 2. Header Utama
+st.markdown("""
+    <div class="header-box">
+        <span style="font-size: 34px;">📦</span>
+        <div>
+            <div class="header-title">Inventori Rak</div>
+            <div class="header-subtitle">Sistem Stok & Lokasi</div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
+# 3. Ruang Carian & Penapis
+search_query = st.text_input("🔍 Carian", placeholder="Taip P/N, nama barang, atau lokasi rak...", label_visibility="collapsed")
+
+filter_low_stock = st.checkbox("⚠️ Stok Rendah Sahaja (≤ 50)")
+
+# Mod Paparan Kotak Button (Jadual vs Kad)
+view_mode = st.radio(
+    "Mod Paparan", 
+    ["📋 Jadual (Table)", "🔲 Kad (Cards)"], 
+    horizontal=True, 
+    label_visibility="collapsed"
+)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Kiraan Statistik Data Asal
+total_pn = len(df)
+total_qty = int(df["Quantity"].sum()) if not df.empty else 0
+low_stock_df = df[df['Quantity'] <= 50] if not df.empty else pd.DataFrame()
+low_stock_count = len(low_stock_df)
+total_locations = df['Location'].nunique() if not df.empty else 0
+
+# 4. Hero Banner Utama
+st.markdown(f"""
+    <div class="hero-banner">
+        <div class="hero-label">JUMLAH KUANTITI STOK</div>
+        <div class="hero-val">{total_qty:,} <span style="font-size: 18px; font-weight: normal;">unit</span></div>
+        <div class="hero-badge">📦 {total_pn} Part Number Berdaftar</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# 5. Kad Metrik Ringkasan
+m1, m2, m3 = st.columns(3)
+
+with m1:
+    st.markdown(f"""
+        <div class="metric-card-dark">
+            <div>
+                <div class="metric-title">Total P/N</div>
+                <div class="metric-num">{total_pn}</div>
+            </div>
+            <span style="font-size: 22px;">📊</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+with m2:
+    st.markdown(f"""
+        <div class="metric-card-dark">
+            <div>
+                <div class="metric-title">Stok Rendah (≤50)</div>
+                <div class="metric-num" style="color: #FF5E00;">{low_stock_count}</div>
+            </div>
+            <div class="btn-pill-red">Perlu Diperiksa</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+with m3:
+    st.markdown(f"""
+        <div class="metric-card-dark">
+            <div>
+                <div class="metric-title">Lokasi Rak</div>
+                <div class="metric-num">{total_locations}</div>
+            </div>
+            <div class="btn-pill-purple">Lihat Semua →</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
+
+# 6. Tapis Data Mengikut Carian
+filtered_df = df.copy()
+
+if search_query:
+    mask = (
+        filtered_df['P/N'].astype(str).str.contains(search_query, case=False, na=False) |
+        filtered_df['Description'].astype(str).str.contains(search_query, case=False, na=False) |
+        filtered_df['Location'].astype(str).str.contains(search_query, case=False, na=False)
+    )
+    filtered_df = filtered_df[mask]
+
+if filter_low_stock:
+    filtered_df = filtered_df[filtered_df['Quantity'] <= 50]
+
+# 7. Paparan Senarai Inventori
+st.subheader("📚 Senarai Inventori")
+
+def get_status_badge(qty):
+    if qty <= 20:
+        return "<span class='badge-rendah'>Rendah</span>"
+    elif qty <= 50:
+        return "<span class='badge-sederhana'>Sederhana</span>"
+    else:
+        return "<span class='badge-ok'>OK</span>"
+
+if not filtered_df.empty:
+    if "Jadual" in view_mode:
+        display_df = filtered_df.copy()
+        display_df['Status'] = display_df['Quantity'].apply(lambda x: "Rendah" if x <= 20 else ("Sederhana" if x <= 50 else "OK"))
+        
+        st.dataframe(
+            display_df[['P/N', 'Description', 'Location', 'Quantity', 'Status']],
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "P/N": st.column_config.TextColumn("P/N"),
+                "Description": st.column_config.TextColumn("Nama Barang"),
+                "Location": st.column_config.TextColumn("Lokasi Rak"),
+                "Quantity": st.column_config.NumberColumn("Stok", format="%d"),
+                "Status": st.column_config.TextColumn("Status")
+            }
+        )
+    else:
+        for idx, row in filtered_df.iterrows():
+            st.markdown(f"""
+                <div class="metric-card-dark">
+                    <div>
+                        <div style="font-size: 16px; font-weight: 800; color: #FFF;">P/N: {row['P/N']}</div>
+                        <div style="font-size: 13px; color: #94A3B8;"><b>Barang:</b> {row['Description']} | <b>Rak:</b> 📍 {row['Location']}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 16px; font-weight: 800;">{row['Quantity']} unit</div>
+                        <div style="margin-top: 4px;">{get_status_badge(row['Quantity'])}</div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+else:
+    st.warning("⚠️ Tiada maklumat rekod dijumpai.")
+
+# 8. Sidebar Panel Kawalan
+with st.sidebar:
+    st.header("⚙️ Panel Kawalan")
+    
+    tab1, tab2, tab3 = st.tabs(["➕ Kemaskini", "🗑️ Padam", "📥 Muat Turun"])
+    
+    with tab1:
+        st.caption("Masukkan P/N sedia ada untuk kemaskini, atau P/N baru untuk tambah.")
+        pn_in = st.text_input("Part Number (P/N) *", placeholder="Contoh: P01234")
+        desc_in = st.text_input("Description *", placeholder="Contoh: Server Board / Memory DIMM")
+        loc_in = st.text_input("Lokasi Rak (cth: R2-B-1) *", placeholder="Contoh: R2-B-1")
+        qty_in = st.number_input("Kuantiti (Qty) *", min_value=0, value=1)
+        
+        if st.button("💾 Simpan / Update Data", use_container_width=True, type="primary"):
+            if pn_in and loc_in:
+                pn_clean = str(pn_in).strip()
+                if pn_clean in df['P/N'].astype(str).values:
+                    df.loc[df['P/N'].astype(str) == pn_clean, ['Description', 'Location', 'Quantity']] = [desc_in, loc_in, qty_in]
+                    st.toast(f"P/N {pn_clean} dikemaskini!", icon="🔄")
+                else:
+                    new_row = pd.DataFrame([{"P/N": pn_clean, "Description": desc_in, "Location": loc_in, "Quantity": qty_in}])
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    st.toast(f"P/N {pn_clean} ditambah!", icon="✅")
+                
+                df.to_csv("data.csv", index=False)
+                st.rerun()
+            else:
+                st.error("Sila isi P/N dan Lokasi Rak.")
+
+    with tab2:
+        if not df.empty:
+            options = df.apply(lambda r: f"{r['P/N']} - {r['Description']}", axis=1).tolist()
+            selected = st.selectbox("Pilih item untuk dipadam:", options)
+            if st.button("🗑️ Padam Item Ini", use_container_width=True, type="primary"):
+                target_pn = selected.split(" - ")[0]
+                df = df[df['P/N'].astype(str) != str(target_pn)]
+                df.to_csv("data.csv", index=False)
+                st.toast(f"P/N {target_pn} dipadam!", icon="🗑️")
+                st.rerun()
+        else:
+            st.info("Tiada data stok.")
+
+    with tab3:
+        csv_bytes = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Muat Turun CSV",
+            data=csv_bytes,
+            file_name="inventori_rak_terkini.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+
+    st.markdown("""
+        <div class="sidebar-tips">
+            <div style="font-weight: 700; color: #60A5FA; font-size: 13px;">💡 Tips</div>
+            <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">
+                Pastikan format P/N, lokasi rak dan kuantiti adalah betul sebelum menyimpan data.
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
