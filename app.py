@@ -80,51 +80,76 @@ m1, m2, m3, m4 = st.columns(4)
 
 total_pn = len(df)
 total_qty = int(df["Quantity"].sum()) if not df.empty else 0
-low_stock_count = len(df[df['Quantity'] <= 2]) if not df.empty else 0
+low_stock_df = df[df['Quantity'] <= 50] if not df.empty else pd.DataFrame()
+low_stock_count = len(low_stock_df)
 total_locations = df['Location'].nunique() if not df.empty else 0
 
 m1.markdown(f'<div class="metric-card"><div class="metric-value">{total_pn}</div><div class="metric-label">Total P/N Berdaftar</div></div>', unsafe_allow_html=True)
 m2.markdown(f'<div class="metric-card"><div class="metric-value">{total_qty}</div><div class="metric-label">Jumlah Unit Stok</div></div>', unsafe_allow_html=True)
-m3.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #feb2b2;">{low_stock_count}</div><div class="metric-label">Item Stok Rendah (≤2)</div></div>', unsafe_allow_html=True)
+m3.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #feb2b2;">{low_stock_count}</div><div class="metric-label">Item Stok Rendah (≤50)</div></div>', unsafe_allow_html=True)
 m4.markdown(f'<div class="metric-card"><div class="metric-value" style="color: #68d391;">{total_locations}</div><div class="metric-label">Jumlah Lokasi Rak</div></div>', unsafe_allow_html=True)
 
 st.divider()
 
+# ⚠️ Ruang Khas: Tekan Untuk Lihat Senarai Stok Rendah
+with st.expander(f"🔴 Tekan Sini Untuk Lihat Senarai P/N Stok Rendah ≤ 50 Unit ({low_stock_count} item)", expanded=False):
+    if not low_stock_df.empty:
+        st.dataframe(
+            low_stock_df[['P/N', 'Description', 'Location', 'Quantity']],
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "P/N": "Part Number (P/N)",
+                "Description": "Nama Item",
+                "Location": "Lokasi Rak",
+                "Quantity": st.column_config.NumberColumn("Kuantiti (Unit)", format="%d")
+            }
+        )
+    else:
+        st.success("✅ Semua stok mencukupi (Tiada item bawah 50 unit).")
+
+st.divider()
+
 # 🔍 Carian dan Penapis (Filters)
-col_search, col_view = st.columns([3, 1])
+col_search, col_filter, col_view = st.columns([3, 2, 2])
 
 with col_search:
-    search = st.text_input("🔍 Carian Pantas", placeholder="Taip Part Number (P/N), Description, atau Lokasi (cth: R1-A-1)...")
+    search = st.text_input("🔍 Carian Pantas", placeholder="Taip P/N, Description, atau Lokasi...")
+
+with col_filter:
+    filter_low_stock = st.checkbox("⚠️ Papar Stok Rendah Sahaja (≤ 50 unit)")
 
 with col_view:
     view_type = st.radio("Mod Paparan:", ["Jadual (Table)", "Kad (Cards)"], horizontal=True)
 
-# Tapis Data
+# Tapis Data Mengikut Carian dan Checkbox
+filtered_df = df.copy()
+
 if search:
     mask = (
-        df['P/N'].astype(str).str.contains(search, case=False, na=False) |
-        df['Description'].astype(str).str.contains(search, case=False, na=False) |
-        df['Location'].astype(str).str.contains(search, case=False, na=False)
+        filtered_df['P/N'].astype(str).str.contains(search, case=False, na=False) |
+        filtered_df['Description'].astype(str).str.contains(search, case=False, na=False) |
+        filtered_df['Location'].astype(str).str.contains(search, case=False, na=False)
     )
-    filtered_df = df[mask]
-else:
-    filtered_df = df
+    filtered_df = filtered_df[mask]
 
-# 📋 Paparan Data
+if filter_low_stock:
+    filtered_df = filtered_df[filtered_df['Quantity'] <= 50]
+
+# 📋 Paparan Data Utama
 st.subheader(f"Senarai Barang ({len(filtered_df)} dijumpai)")
 
 if not filtered_df.empty:
     if view_type == "Jadual (Table)":
-        # Formatkan Jadual Interaktif
         display_df = filtered_df.copy()
-        display_df['Status'] = display_df['Quantity'].apply(lambda x: "⚠️ Stok Rendah" if x <= 2 else "✅ Mencukupi")
+        display_df['Status'] = display_df['Quantity'].apply(lambda x: "⚠️ Stok Rendah" if x <= 50 else "✅ Mencukupi")
         
         st.dataframe(
             display_df[['P/N', 'Description', 'Location', 'Quantity', 'Status']],
             use_container_width=True,
             hide_index=True,
             column_config={
-                "P/N": st.column_config.TextColumn("Part Number (P/N)", help="Kod unik komponen"),
+                "P/N": st.column_config.TextColumn("Part Number (P/N)"),
                 "Description": st.column_config.TextColumn("Nama / Perincian Item"),
                 "Location": st.column_config.TextColumn("Lokasi Rak"),
                 "Quantity": st.column_config.NumberColumn("Kuantiti (Unit)", format="%d"),
@@ -132,7 +157,6 @@ if not filtered_df.empty:
             }
         )
     else:
-        # Format Kad Visual
         for idx, row in filtered_df.iterrows():
             with st.container():
                 c1, c2, c3, c4 = st.columns([2, 4, 2, 2])
@@ -140,7 +164,7 @@ if not filtered_df.empty:
                 c2.write(f"**Description:** {row['Description']}")
                 c3.markdown(f"**Rak:** <span class='location-tag'>📍 {row['Location']}</span>", unsafe_allow_html=True)
                 
-                status_badge = "<span class='badge-low'>⚠️ Stok Rendah</span>" if row['Quantity'] <= 2 else "<span class='badge-ok'>✅ Mencukupi</span>"
+                status_badge = "<span class='badge-low'>⚠️ Stok Rendah</span>" if row['Quantity'] <= 50 else "<span class='badge-ok'>✅ Mencukupi</span>"
                 c4.markdown(f"**Qty:** `{row['Quantity']} unit` &nbsp; {status_badge}", unsafe_allow_html=True)
                 st.divider()
 else:
