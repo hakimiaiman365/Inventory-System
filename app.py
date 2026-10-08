@@ -9,10 +9,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Custom CSS Cyberpunk Dark Mode (Sembunyi Radio Dot 100% & Tajuk Terang)
+# 2. Custom CSS Dark Mode Cyberpunk (Tampilan 100% Mirip Desain Acuan)
 st.markdown("""
 <style>
-/* App Container Base */
+/* Background & Fon Utama */
 .stApp {
     background-color: #070913 !important;
     color: #E2E8F0 !important;
@@ -20,18 +20,17 @@ st.markdown("""
 }
 
 .block-container {
-    padding-top: 0.5rem !important;
+    padding-top: 1rem !important;
     padding-bottom: 5rem !important;
     max-width: 650px !important;
 }
 
-/* Sembunyikan Header Transparan Default Streamlit */
 header[data-testid="stHeader"] {
     background-color: transparent !important;
     z-index: 1 !important;
 }
 
-/* KOTAK PENAPIS RADIO: PADAM 100% BULATAN/DOT RADIO (TICK2) */
+/* Sembunyikan Radio Dot / Tick sepenuhnya */
 [data-testid="stRadio"] [data-testid="stWidgetLabel"] {
     display: none !important;
 }
@@ -61,7 +60,6 @@ header[data-testid="stHeader"] {
     align-items: center !important;
 }
 
-/* PAKSA HILANG SEMUA BULATAN RADIO DOTS / CIRCLES */
 [data-testid="stRadio"] label div[role="radio"],
 [data-testid="stRadio"] label div[data-baseweb="radio"],
 [data-testid="stRadio"] label input,
@@ -73,11 +71,8 @@ header[data-testid="stHeader"] {
     width: 0 !important;
     height: 0 !important;
     opacity: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
 }
 
-/* Butang Terpilih (Active Button) */
 [data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked),
 [data-testid="stRadio"] div[role="radiogroup"] label[data-checked="true"] {
     background: linear-gradient(135deg, #FF6B00 0%, #FFA800 100%) !important;
@@ -192,10 +187,72 @@ header[data-testid="stHeader"] {
     font-weight: 700;
 }
 
-/* Status Badges */
-.badge-ok { background-color: #064E3B; color: #34D399; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: inline-block; }
-.badge-sederhana { background-color: #78350F; color: #FBBF24; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: inline-block; }
-.badge-rendah { background-color: #7F1D1D; color: #FCA5A5; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: inline-block; }
+/* Badge Lencana Warna Status Stok */
+.badge-status-ok {
+    background-color: #059669;
+    color: #FFFFFF;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-block;
+    text-align: center;
+}
+.badge-status-sederhana {
+    background-color: #D97706;
+    color: #FFFFFF;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-block;
+    text-align: center;
+}
+.badge-status-rendah {
+    background-color: #DC2626;
+    color: #FFFFFF;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Styling Tabel Kustom */
+.custom-inv-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    margin-top: 6px;
+}
+.custom-inv-table th {
+    color: #8A99AD;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #1C253B;
+}
+.custom-inv-table td {
+    background-color: #111625;
+    padding: 12px;
+    font-size: 13px;
+    color: #E2E8F0;
+    vertical-align: middle;
+}
+.custom-inv-table tr td:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    color: #8A99AD;
+    width: 30px;
+}
+.custom-inv-table tr td:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    text-align: center;
+}
 
 .inventory-item-card {
     background-color: #111625;
@@ -241,7 +298,7 @@ def load_data():
 
 df = load_data()
 
-# 4. Header Bar Utama (Menggunakan Tag H1 Terang + Padding Atas Yang Cukup)
+# 4. Header Bar Utama
 st.markdown("""
 <div style="padding: 10px 0px 15px 0px; margin-bottom: 10px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -362,43 +419,52 @@ st.markdown("""
 
 def get_status_badge(qty):
     if qty <= 20:
-        return "<span class='badge-rendah'>Rendah</span>"
+        return "<span class='badge-status-rendah'>Rendah</span>"
     elif qty <= 50:
-        return "<span class='badge-sederhana'>Sederhana</span>"
+        return "<span class='badge-status-sederhana'>Sederhana</span>"
     else:
-        return "<span class='badge-ok'>OK</span>"
+        return "<span class='badge-status-ok'>OK</span>"
 
 if not filtered_df.empty:
     if "Jadual" in view_mode:
-        display_df = filtered_df.copy()
-        display_df['Status'] = display_df['Quantity'].apply(lambda x: "Rendah" if x <= 20 else ("Sederhana" if x <= 50 else "OK"))
+        # Tabel HTML dengan lencana kapsul berwarna
+        rows_html = ""
+        for i, row in filtered_df.reset_index(drop=True).iterrows():
+            badge = get_status_badge(row['Quantity'])
+            rows_html += f"<tr><td>{i+1}</td><td><b>{row['P/N']}</b></td><td>{row['Description']}</td><td><code style='background:#1E293B; color:#93C5FD; padding:2px 6px; border-radius:6px;'>{row['Location']}</code></td><td><b>{row['Quantity']}</b></td><td>{badge}</td></tr>"
         
-        st.dataframe(
-            display_df[['P/N', 'Description', 'Location', 'Quantity', 'Status']],
-            use_container_width=True,
-            hide_index=True,
-            column_config={
-                "P/N": st.column_config.TextColumn("P/N"),
-                "Description": st.column_config.TextColumn("Nama Barang"),
-                "Location": st.column_config.TextColumn("Lokasi Rak"),
-                "Quantity": st.column_config.NumberColumn("Stok", format="%d"),
-                "Status": st.column_config.TextColumn("Status")
-            }
-        )
+        table_html = f"""
+<table class="custom-inv-table">
+<thead>
+<tr>
+<th>#</th>
+<th>P/N</th>
+<th>Nama Barang</th>
+<th>Lokasi Rak</th>
+<th>Stok</th>
+<th style="text-align:center;">Status</th>
+</tr>
+</thead>
+<tbody>
+{rows_html}
+</tbody>
+</table>
+"""
+        st.markdown(table_html, unsafe_allow_html=True)
     else:
         for idx, row in filtered_df.iterrows():
             st.markdown(f"""
-            <div class="inventory-item-card">
-                <div>
-                    <div style="font-size: 15px; font-weight: 800; color: #FFF;">P/N: {row['P/N']}</div>
-                    <div style="font-size: 12px; color: #8A99AD; margin-top:2px;"><b>Barang:</b> {row['Description']} | <b>Rak:</b> 📍 {row['Location']}</div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 15px; font-weight: 800; color: #FFF;">{row['Quantity']} unit</div>
-                    <div style="margin-top: 4px;">{get_status_badge(row['Quantity'])}</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+<div class="inventory-item-card">
+    <div>
+        <div style="font-size: 15px; font-weight: 800; color: #FFF;">P/N: {row['P/N']}</div>
+        <div style="font-size: 12px; color: #8A99AD; margin-top:2px;"><b>Barang:</b> {row['Description']} | <b>Rak:</b> 📍 {row['Location']}</div>
+    </div>
+    <div style="text-align: right;">
+        <div style="font-size: 15px; font-weight: 800; color: #FFF;">{row['Quantity']} unit</div>
+        <div style="margin-top: 4px;">{get_status_badge(row['Quantity'])}</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 else:
     st.warning("⚠️ Tiada maklumat rekod dijumpai.")
 
@@ -418,3 +484,38 @@ with st.sidebar:
         if st.button("💾 Simpan / Update Data", use_container_width=True, type="primary"):
             if pn_in and loc_in:
                 pn_clean = str(pn_in).strip()
+                if pn_clean in df['P/N'].astype(str).values:
+                    df.loc[df['P/N'].astype(str) == pn_clean, ['Description', 'Location', 'Quantity']] = [desc_in, loc_in, qty_in]
+                    st.toast(f"P/N {pn_clean} dikemaskini!", icon="🔄")
+                else:
+                    new_row = pd.DataFrame([{"P/N": pn_clean, "Description": desc_in, "Location": loc_in, "Quantity": qty_in}])
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    st.toast(f"P/N {pn_clean} ditambah!", icon="✅")
+                
+                df.to_csv("data.csv", index=False)
+                st.rerun()
+            else:
+                st.error("Sila isi P/N dan Lokasi Rak.")
+
+    with tab2:
+        if not df.empty:
+            options = df.apply(lambda r: f"{r['P/N']} - {r['Description']}", axis=1).tolist()
+            selected = st.selectbox("Pilih item untuk dipadam:", options)
+            if st.button("🗑️ Padam Item Ini", use_container_width=True, type="primary"):
+                target_pn = selected.split(" - ")[0]
+                df = df[df['P/N'].astype(str) != str(target_pn)]
+                df.to_csv("data.csv", index=False)
+                st.toast(f"P/N {target_pn} dipadam!", icon="🗑️")
+                st.rerun()
+        else:
+            st.info("Tiada data stok.")
+
+    with tab3:
+        csv_bytes = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Muat Turun CSV",
+            data=csv_bytes,
+            file_name="inventori_rak_terkini.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
