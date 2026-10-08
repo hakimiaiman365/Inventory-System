@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Custom CSS Dark Mode Cyberpunk (Tampilan 100% Mirip Desain Acuan)
+# 2. Custom CSS Dark Mode Cyberpunk (Kemas & Lokasi Straight)
 st.markdown("""
 <style>
 /* Background & Fon Utama */
@@ -197,6 +197,7 @@ header[data-testid="stHeader"] {
     font-weight: 800;
     display: inline-block;
     text-align: center;
+    white-space: nowrap;
 }
 .badge-status-sederhana {
     background-color: #D97706;
@@ -207,6 +208,7 @@ header[data-testid="stHeader"] {
     font-weight: 800;
     display: inline-block;
     text-align: center;
+    white-space: nowrap;
 }
 .badge-status-rendah {
     background-color: #DC2626;
@@ -217,6 +219,14 @@ header[data-testid="stHeader"] {
     font-weight: 800;
     display: inline-block;
     text-align: center;
+    white-space: nowrap;
+}
+
+/* Container Skrol Horizontal Untuk Skrin Telefon */
+.table-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Styling Tabel Kustom */
@@ -231,13 +241,14 @@ header[data-testid="stHeader"] {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 10px 12px;
+    padding: 10px 10px;
     text-align: left;
     border-bottom: 1px solid #1C253B;
+    white-space: nowrap; /* Menghalang tajuk daripada terlipat */
 }
 .custom-inv-table td {
     background-color: #111625;
-    padding: 12px;
+    padding: 10px 12px;
     font-size: 13px;
     color: #E2E8F0;
     vertical-align: middle;
@@ -246,12 +257,24 @@ header[data-testid="stHeader"] {
     border-top-left-radius: 12px;
     border-bottom-left-radius: 12px;
     color: #8A99AD;
-    width: 30px;
+    width: 25px;
 }
 .custom-inv-table tr td:last-child {
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
     text-align: center;
+}
+
+/* Badge Lokasi Rak Mendatar Straight */
+.loc-badge {
+    background: #1E293B;
+    color: #93C5FD;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-weight: 700;
+    white-space: nowrap !important; /* Paksa satu baris lurus */
+    display: inline-block;
 }
 
 .inventory-item-card {
@@ -427,21 +450,21 @@ def get_status_badge(qty):
 
 if not filtered_df.empty:
     if "Jadual" in view_mode:
-        # Tabel HTML dengan lencana kapsul berwarna
         rows_html = ""
         for i, row in filtered_df.reset_index(drop=True).iterrows():
             badge = get_status_badge(row['Quantity'])
-            rows_html += f"<tr><td>{i+1}</td><td><b>{row['P/N']}</b></td><td>{row['Description']}</td><td><code style='background:#1E293B; color:#93C5FD; padding:2px 6px; border-radius:6px;'>{row['Location']}</code></td><td><b>{row['Quantity']}</b></td><td>{badge}</td></tr>"
+            rows_html += f"<tr><td>{i+1}</td><td style='white-space:nowrap;'><b>{row['P/N']}</b></td><td>{row['Description']}</td><td style='white-space:nowrap;'><span class='loc-badge'>{row['Location']}</span></td><td style='white-space:nowrap; text-align:center;'><b>{row['Quantity']}</b></td><td style='white-space:nowrap;'>{badge}</td></tr>"
         
         table_html = f"""
+<div class="table-scroll-container">
 <table class="custom-inv-table">
 <thead>
 <tr>
 <th>#</th>
 <th>P/N</th>
 <th>Nama Barang</th>
-<th>Lokasi Rak</th>
-<th>Stok</th>
+<th style="white-space:nowrap;">Lokasi Rak</th>
+<th style="text-align:center;">Stok</th>
 <th style="text-align:center;">Status</th>
 </tr>
 </thead>
@@ -449,6 +472,7 @@ if not filtered_df.empty:
 {rows_html}
 </tbody>
 </table>
+</div>
 """
         st.markdown(table_html, unsafe_allow_html=True)
     else:
