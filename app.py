@@ -9,10 +9,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Custom CSS Cyberpunk Dark Mode (Sama 100% & Kalis Ralat)
+# 2. Custom CSS Cyberpunk Dark Mode (Sembunyi Radio Dot 100% & Tajuk Terang)
 st.markdown("""
 <style>
-/* Global App Container */
+/* App Container Base */
 .stApp {
     background-color: #070913 !important;
     color: #E2E8F0 !important;
@@ -20,36 +20,70 @@ st.markdown("""
 }
 
 .block-container {
-    padding-top: 1rem !important;
+    padding-top: 0.5rem !important;
     padding-bottom: 5rem !important;
     max-width: 650px !important;
 }
 
-/* Header Bar */
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+/* Sembunyikan Header Transparan Default Streamlit */
+header[data-testid="stHeader"] {
+    background-color: transparent !important;
+    z-index: 1 !important;
 }
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+
+/* KOTAK PENAPIS RADIO: PADAM 100% BULATAN/DOT RADIO (TICK2) */
+[data-testid="stRadio"] [data-testid="stWidgetLabel"] {
+    display: none !important;
 }
-.main-title {
-    font-size: 24px;
-    font-weight: 800;
-    color: #FFFFFF;
-    line-height: 1.1;
+[data-testid="stRadio"] div[role="radiogroup"] {
+    display: flex !important;
+    background-color: #111625 !important;
+    padding: 4px !important;
+    border-radius: 14px !important;
+    border: 1px solid #1C253B !important;
+    gap: 6px !important;
+    width: 100% !important;
 }
-.main-title span {
-    color: #FF7A00;
+[data-testid="stRadio"] div[role="radiogroup"] label {
+    flex: 1 !important;
+    text-align: center !important;
+    background-color: transparent !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    margin: 0 !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #8A99AD !important;
+    font-weight: 700 !important;
+    justify-content: center !important;
+    font-size: 13px !important;
+    display: flex !important;
+    align-items: center !important;
 }
-.sub-title {
-    font-size: 11px;
-    color: #8A99AD;
-    font-weight: 500;
+
+/* PAKSA HILANG SEMUA BULATAN RADIO DOTS / CIRCLES */
+[data-testid="stRadio"] label div[role="radio"],
+[data-testid="stRadio"] label div[data-baseweb="radio"],
+[data-testid="stRadio"] label input,
+[data-testid="stRadio"] label svg,
+[data-testid="stRadio"] label [data-testid="stRadioButtonCustomIcon"],
+[data-testid="stRadio"] label > div:first-child {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Butang Terpilih (Active Button) */
+[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked),
+[data-testid="stRadio"] div[role="radiogroup"] label[data-checked="true"] {
+    background: linear-gradient(135deg, #FF6B00 0%, #FFA800 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.35) !important;
 }
 
 /* Hero Banner Card */
@@ -158,54 +192,11 @@ st.markdown("""
     font-weight: 700;
 }
 
-/* BUANG SEPENUHNYA BULATAN RADIO TICK2 DI FON & DESKTOP */
-[data-testid="stRadio"] [data-testid="stWidgetLabel"] { display: none !important; }
-[data-testid="stRadio"] div[role="radiogroup"] {
-    display: flex !important;
-    background-color: #111625 !important;
-    padding: 4px !important;
-    border-radius: 16px !important;
-    border: 1px solid #1C253B !important;
-    gap: 6px !important;
-    width: 100% !important;
-}
-[data-testid="stRadio"] div[role="radiogroup"] label {
-    flex: 1 !important;
-    text-align: center !important;
-    background-color: transparent !important;
-    border-radius: 12px !important;
-    padding: 10px 12px !important;
-    margin: 0 !important;
-    border: none !important;
-    cursor: pointer !important;
-    color: #8A99AD !important;
-    font-weight: 700 !important;
-    justify-content: center !important;
-    font-size: 13px !important;
-}
-/* Sembunyi semua elemen radio icon/dot */
-[data-testid="stRadio"] div[role="radiogroup"] label > div:first-child,
-[data-testid="stRadio"] div[role="radiogroup"] label input,
-[data-testid="stRadio"] div[role="radiogroup"] label svg {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-/* Style bila butang dipilih */
-[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked),
-[data-testid="stRadio"] div[role="radiogroup"] label[data-checked="true"] {
-    background: linear-gradient(135deg, #FF6B00 0%, #FFA800 100%) !important;
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.35) !important;
-}
-
 /* Status Badges */
 .badge-ok { background-color: #064E3B; color: #34D399; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: inline-block; }
 .badge-sederhana { background-color: #78350F; color: #FBBF24; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: inline-block; }
 .badge-rendah { background-color: #7F1D1D; color: #FCA5A5; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; display: inline-block; }
 
-/* Item Card dalam Senarai */
 .inventory-item-card {
     background-color: #111625;
     border: 1px solid #1C253B;
@@ -217,7 +208,6 @@ st.markdown("""
     align-items: center;
 }
 
-/* Sidebar Styling */
 section[data-testid="stSidebar"] {
     background-color: #0B0E1B !important;
     border-right: 1px solid #1C253B;
@@ -239,7 +229,7 @@ section[data-testid="stSidebar"] {
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Fungsi Muat Data Pangkalan Asal (data.csv)
+# 3. Fungsi Muat Data
 @st.cache_data(ttl=2)
 def load_data():
     try:
@@ -251,21 +241,27 @@ def load_data():
 
 df = load_data()
 
-# 4. Header Bar
+# 4. Header Bar Utama (Menggunakan Tag H1 Terang + Padding Atas Yang Cukup)
 st.markdown("""
-<div class="header-container">
-    <div class="header-left">
-        <span style="font-size: 30px;">📦</span>
-        <div>
-            <div class="main-title">Inventori <span>Rak</span></div>
-            <div class="sub-title">Sistem Stok & Lokasi</div>
+<div style="padding: 10px 0px 15px 0px; margin-bottom: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 34px; line-height: 1;">📦</span>
+            <div>
+                <h1 style="margin: 0; padding: 0; font-size: 26px; font-weight: 900; color: #FFFFFF !important; line-height: 1.1; letter-spacing: -0.5px;">
+                    Inventori <span style="color: #FF7A00 !important;">Rak</span>
+                </h1>
+                <p style="margin: 2px 0 0 0; padding: 0; font-size: 12px; color: #8A99AD !important; font-weight: 600;">
+                    Sistem Stok & Lokasi
+                </p>
+            </div>
         </div>
+        <div style="font-size: 18px; color: #60A5FA; background-color: #111625; width: 38px; height: 38px; border-radius: 50%; border: 1px solid #1C253B; display: flex; align-items: center; justify-content: center;">👤</div>
     </div>
-    <div style="font-size: 22px; color: #60A5FA;">👤</div>
 </div>
 """, unsafe_allow_html=True)
 
-# 5. Carian Pantas (Paling Atas)
+# 5. Carian Pantas
 search_query = st.text_input(
     "🔍 Carian Pantas", 
     placeholder="Taip P/N, nama barang, atau lokasi rak...", 
@@ -377,7 +373,6 @@ if not filtered_df.empty:
         display_df = filtered_df.copy()
         display_df['Status'] = display_df['Quantity'].apply(lambda x: "Rendah" if x <= 20 else ("Sederhana" if x <= 50 else "OK"))
         
-        # Paparan Jadual Native Streamlit yang Responsif
         st.dataframe(
             display_df[['P/N', 'Description', 'Location', 'Quantity', 'Status']],
             use_container_width=True,
@@ -423,38 +418,3 @@ with st.sidebar:
         if st.button("💾 Simpan / Update Data", use_container_width=True, type="primary"):
             if pn_in and loc_in:
                 pn_clean = str(pn_in).strip()
-                if pn_clean in df['P/N'].astype(str).values:
-                    df.loc[df['P/N'].astype(str) == pn_clean, ['Description', 'Location', 'Quantity']] = [desc_in, loc_in, qty_in]
-                    st.toast(f"P/N {pn_clean} dikemaskini!", icon="🔄")
-                else:
-                    new_row = pd.DataFrame([{"P/N": pn_clean, "Description": desc_in, "Location": loc_in, "Quantity": qty_in}])
-                    df = pd.concat([df, new_row], ignore_index=True)
-                    st.toast(f"P/N {pn_clean} ditambah!", icon="✅")
-                
-                df.to_csv("data.csv", index=False)
-                st.rerun()
-            else:
-                st.error("Sila isi P/N dan Lokasi Rak.")
-
-    with tab2:
-        if not df.empty:
-            options = df.apply(lambda r: f"{r['P/N']} - {r['Description']}", axis=1).tolist()
-            selected = st.selectbox("Pilih item untuk dipadam:", options)
-            if st.button("🗑️ Padam Item Ini", use_container_width=True, type="primary"):
-                target_pn = selected.split(" - ")[0]
-                df = df[df['P/N'].astype(str) != str(target_pn)]
-                df.to_csv("data.csv", index=False)
-                st.toast(f"P/N {target_pn} dipadam!", icon="🗑️")
-                st.rerun()
-        else:
-            st.info("Tiada data stok.")
-
-    with tab3:
-        csv_bytes = df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Muat Turun CSV",
-            data=csv_bytes,
-            file_name="inventori_rak_terkini.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
