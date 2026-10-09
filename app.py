@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Custom CSS Dark Mode Cyberpunk (Kemas & Lokasi Straight)
+# 2. Custom CSS Dark Mode Cyberpunk (Warna Kotak Sama Dengan Warna Kad Atas)
 st.markdown("""
 <style>
 /* Background & Fon Utama */
@@ -81,7 +81,7 @@ header[data-testid="stHeader"] {
     box-shadow: 0 4px 15px rgba(255, 107, 0, 0.35) !important;
 }
 
-/* Hero Banner Card */
+/* Hero Banner Card (Kad Atas) */
 .hero-banner-card {
     background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%);
     border-radius: 20px;
@@ -135,17 +135,18 @@ header[data-testid="stHeader"] {
     color: #FFFFFF !important;
 }
 
-/* Stacked Metric Cards */
+/* Stacked Metric Cards (Warna Sama Mengikut Kad Atas) */
 .metric-item-card {
-    background-color: #111625;
-    border: 1px solid #1C253B;
+    background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%);
+    border: none;
     border-radius: 18px;
-    padding: 14px 18px;
-    margin-bottom: 10px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(255, 94, 0, 0.25);
+    color: #FFFFFF !important;
 }
 .metric-left-box {
     display: flex;
@@ -153,38 +154,48 @@ header[data-testid="stHeader"] {
     gap: 14px;
 }
 .icon-square {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF !important;
 }
-.icon-purple { background: rgba(124, 58, 237, 0.15); color: #A78BFA; }
-.icon-red { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
-.icon-blue { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
 
-.metric-label-text { font-size: 11px; color: #8A99AD; font-weight: 600; }
-.metric-value-text { font-size: 24px; font-weight: 800; color: #FFFFFF; line-height: 1; }
+.metric-label-text { 
+    font-size: 11px; 
+    color: rgba(255, 255, 255, 0.9); 
+    font-weight: 700; 
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.metric-value-text { 
+    font-size: 26px; 
+    font-weight: 900; 
+    color: #FFFFFF !important; 
+    line-height: 1.1; 
+}
 
 .pill-action-red {
-    background: rgba(239, 68, 68, 0.15);
-    color: #F87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    padding: 5px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 14px;
     border-radius: 20px;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 800;
 }
 .pill-action-purple {
-    background: rgba(124, 58, 237, 0.15);
-    color: #C084FC;
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    padding: 5px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 14px;
     border-radius: 20px;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 /* Badge Lencana Warna Status Stok */
@@ -244,7 +255,7 @@ header[data-testid="stHeader"] {
     padding: 10px 10px;
     text-align: left;
     border-bottom: 1px solid #1C253B;
-    white-space: nowrap; /* Menghalang tajuk daripada terlipat */
+    white-space: nowrap;
 }
 .custom-inv-table td {
     background-color: #111625;
@@ -273,7 +284,7 @@ header[data-testid="stHeader"] {
     border-radius: 6px;
     font-family: monospace;
     font-weight: 700;
-    white-space: nowrap !important; /* Paksa satu baris lurus */
+    white-space: nowrap !important;
     display: inline-block;
 }
 
@@ -381,11 +392,11 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 7. Stacked KPI Metric Cards
+# 7. Stacked KPI Metric Cards (Warna Sama Seperti Kad Atas)
 st.markdown(f"""
 <div class="metric-item-card">
     <div class="metric-left-box">
-        <div class="icon-square icon-purple">📊</div>
+        <div class="icon-square">📊</div>
         <div>
             <div class="metric-label-text">Total P/N</div>
             <div class="metric-value-text">{total_pn}</div>
@@ -395,10 +406,10 @@ st.markdown(f"""
 
 <div class="metric-item-card">
     <div class="metric-left-box">
-        <div class="icon-square icon-red">⚠️</div>
+        <div class="icon-square">⚠️</div>
         <div>
             <div class="metric-label-text">Stok Rendah (≤50)</div>
-            <div class="metric-value-text" style="color: #FF5E00;">{low_stock_count}</div>
+            <div class="metric-value-text">{low_stock_count}</div>
         </div>
     </div>
     <div class="pill-action-red">Perlu Diperiksa</div>
@@ -406,7 +417,7 @@ st.markdown(f"""
 
 <div class="metric-item-card">
     <div class="metric-left-box">
-        <div class="icon-square icon-blue">📍</div>
+        <div class="icon-square">📍</div>
         <div>
             <div class="metric-label-text">Lokasi Rak</div>
             <div class="metric-value-text">{total_locations}</div>
