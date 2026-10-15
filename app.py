@@ -9,6 +9,20 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Masukkan kod ini di dalam app.py anda untuk auto-refresh setiap 10 minit (600,000 milisaat)
+import streamlit.components.v1 as components
+
+components.html(
+    """
+    <script>
+        setTimeout(function(){
+            window.parent.location.reload();
+        }, 600000); // 600,000 ms = 10 minit
+    </script>
+    """,
+    height=0,
+)
+
 # 2. Custom CSS Dark Mode Cyberpunk (Warna Kotak Sama Dengan Warna Kad Atas)
 st.markdown("""
 <style>
