@@ -353,12 +353,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 5. Carian Pantas
-
-search = st.text_input(
-    "Carian",
-    placeholder="Taip P/N atau lokasi rak...",
-    label_visibility="collapsed",
+search_query = st.text_input(
+    "Carian", placeholder="Taip P/N atau lokasi rak...", label_visibility="collapsed"
 )
+
 
 filter_low_stock = st.checkbox("⚠️ Stok Rendah Sahaja (≤ 50)")
 
