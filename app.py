@@ -2,15 +2,11 @@ import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
 
-# 1. Konfigurasi Halaman & Layout
 st.set_page_config(
-    page_title="Inventori Rak - Sistem Stok & Lokasi",
-    page_icon="📦",
-    layout="wide",
-    initial_sidebar_state="collapsed",
+    page_title="Inventori Rak", page_icon="📦", layout="centered"
 )
 
-# Auto-refresh setiap 10 minit (600,000 milisaat) supaya aplikasi tidak tidur
+# Auto-refresh setiap 10 minit
 components.html(
     """
     <script>
@@ -22,199 +18,111 @@ components.html(
     height=0,
 )
 
-# 2. Custom CSS Dark Mode Cyberpunk (Warna Kotak Sama Dengan Warna Kad Atas)
 st.markdown(
     """
 <style>
-/* Background & Fon Utama */
-.stApp {
-    background-color: #070913 !important;
-    color: #E2E8F0 !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+.stApp { background-color: #070913; color: #E2E8F0; font-family: sans-serif; }
+.hero-card { background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%); border-radius: 16px; padding: 20px; color: white; margin-bottom: 14px; }
+.inv-card { background-color: #111625; border: 1px solid #1C253B; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.loc-badge { background: #1E293B; color: #93C5FD; padding: 3px 8px; border-radius: 6px; font-family: monospace; font-weight: bold; }
+.stTextInput input { background-color: #111625 !important; color: white !important; border: 1px solid #1C253B !important; border-radius: 12px !important; }
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
-.block-container {
-    padding-top: 1rem !important;
-    padding-bottom: 5rem !important;
-    max-width: 650px !important;
-}
 
-header[data-testid="stHeader"] {
-    background-color: transparent !important;
-    z-index: 1 !important;
-}
+@st.cache_data(ttl=2)
+def load_data():
+  try:
+    df = pd.read_csv("data.csv", dtype={"P/N": str})
+    df["Quantity"] = (
+        pd.to_numeric(df["Quantity"], errors="coerce").fillna(0).astype(int)
+    )
+    return df
+  except:
+    return pd.DataFrame(columns=["P/N", "Description", "Location", "Quantity"])
 
-/* Sembunyikan Radio Dot / Tick sepenuhnya */
-[data-testid="stRadio"] [data-testid="stWidgetLabel"] {
-    display: none !important;
-}
-[data-testid="stRadio"] div[role="radiogroup"] {
-    display: flex !important;
-    background-color: #111625 !important;
-    padding: 4px !important;
-    border-radius: 14px !important;
-    border: 1px solid #1C253B !important;
-    gap: 6px !important;
-    width: 100% !important;
-}
-[data-testid="stRadio"] div[role="radiogroup"] label {
-    flex: 1 !important;
-    text-align: center !important;
-    background-color: transparent !important;
-    border-radius: 10px !important;
-    padding: 10px 14px !important;
-    margin: 0 !important;
-    border: none !important;
-    cursor: pointer !important;
-    color: #8A99AD !important;
-    font-weight: 700 !important;
-    justify-content: center !important;
-    font-size: 13px !important;
-    display: flex !important;
-    align-items: center !important;
-}
 
-[data-testid="stRadio"] label div[role="radio"],
-[data-testid="stRadio"] label div[data-baseweb="radio"],
-[data-testid="stRadio"] label input,
-[data-testid="stRadio"] label svg,
-[data-testid="stRadio"] label [data-testid="stRadioButtonCustomIcon"],
-[data-testid="stRadio"] label > div:first-child {
-    display: none !important;
-    visibility: hidden !important;
-    width: 0 !important;
-    height: 0 !important;
-    opacity: 0 !important;
-}
+df = load_data()
 
-[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked),
-[data-testid="stRadio"] div[role="radiogroup"] label[data-checked="true"] {
-    background: linear-gradient(135deg, #FF6B00 0%, #FFA800 100%) !important;
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
-    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.35) !important;
-}
+st.markdown(
+    """
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+    <span style="font-size: 30px;">📦</span>
+    <div>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: white;">Inventori <span style="color: #FF7A00;">Rak</span></h1>
+        <p style="margin: 0; font-size: 12px; color: #8A99AD;">Sistem Stok & Lokasi</p>
+    </div>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
-/* Hero Banner Card (Kad Atas) */
-.hero-banner-card {
-    background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%);
-    border-radius: 20px;
-    padding: 20px 22px;
-    color: #FFFFFF !important;
-    box-shadow: 0 10px 30px rgba(255, 94, 0, 0.35);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.hero-content-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-.hero-box-icon {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-}
-.hero-text-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-    color: #FFFFFF !important;
-}
-.hero-text-qty {
-    font-size: 36px;
-    font-weight: 900;
-    line-height: 1;
-    color: #FFFFFF !important;
-}
-.hero-text-qty span {
-    font-size: 15px;
-    font-weight: 500;
-}
-.hero-badge-pill {
-    background: rgba(0, 0, 0, 0.25);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #FFFFFF !important;
-}
+# Carian pantas terus keluar hasil tanpa perlu tekan Enter
+search = st.text_input(
+    "Carian", placeholder="Taip P/N atau lokasi rak...", label_visibility="collapsed"
+)
 
-/* Stacked Metric Cards (Warna Sama Mengikut Kad Atas) */
-.metric-item-card {
-    background: linear-gradient(135deg, #FF5E00 0%, #E60067 100%);
-    border: none;
-    border-radius: 18px;
-    padding: 16px 20px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 8px 20px rgba(255, 94, 0, 0.25);
-    color: #FFFFFF !important;
-}
-.metric-left-box {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-.icon-square {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    color: #FFFFFF !important;
-}
+total_qty = int(df["Quantity"].sum()) if not df.empty else 0
+total_pn = len(df)
 
-.metric-label-text { 
-    font-size: 11px; 
-    color: rgba(255, 255, 255, 0.9); 
-    font-weight: 700; 
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.metric-value-text { 
-    font-size: 26px; 
-    font-weight: 900; 
-    color: #FFFFFF !important; 
-    line-height: 1.1; 
-}
+st.markdown(
+    f"""
+<div class="hero-card">
+    <div style="font-size: 11px; font-weight: bold; text-transform: uppercase;">Jumlah Kuantiti Stok</div>
+    <div style="font-size: 32px; font-weight: 900; line-height: 1.2;">{total_qty:,} <span style="font-size: 14px; font-weight: normal;">unit</span></div>
+    <div style="margin-top: 8px; font-size: 12px; background: rgba(0,0,0,0.2); display: inline-block; padding: 4px 10px; border-radius: 12px;">📦 {total_pn} Part Number Berdaftar</div>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
-.pill-action-red {
-    background: rgba(0, 0, 0, 0.25);
-    color: #FFFFFF !important;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 800;
-}
-.pill-action-purple {
-    background: rgba(0, 0, 0, 0.25);
-    color: #FFFFFF !important;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 800;
-}
+filtered_df = df.copy()
+if search:
+  mask = (
+      filtered_df["P/N"]
+      .astype(str)
+      .str.contains(search, case=False, na=False)
+      | filtered_df["Description"]
+      .astype(str)
+      .str.contains(search, case=False, na=False)
+      | filtered_df["Location"]
+      .astype(str)
+      .str.contains(search, case=False, na=False)
+  )
+  filtered_df = filtered_df[mask]
 
-/* Badge Lencana Warna Status Stok */
-.badge-status-ok {
-    background-color: #059669;
-    color: #FFFFFF;
-    padding: 4px 14px;
-    border-radius
+st.markdown(
+    "<h3 style='font-size: 16px; margin-top: 15px;'>Senarai Inventori</h3>",
+    unsafe_allow_html=True,
+)
+
+if not filtered_df.empty:
+  for _, row in filtered_df.iterrows():
+    st.markdown(
+        f"""
+    <div class="inv-card">
+        <div>
+            <div style="font-size: 14px; font-weight: 800; color: white;">P/N: {row['P/N']}</div>
+            <div style="font-size: 12px; color: #8A99AD; margin-top: 2px;">{row['Description']} | Rak: <span class="loc-badge">{row['Location']}</span></div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 14px; font-weight: 800; color: white;">{row['Quantity']} unit</div>
+        </div>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+else:
+  st.warning("Tiada rekod dijumpai.")
+
+with st.sidebar:
+  st.header("Panel Kawalan")
+  if st.button("Muat Turun CSV", use_container_width=True):
+    st.download_button(
+        "Klik untuk Download",
+        df.to_csv(index=False).encode("utf-8"),
+        "inventori.csv",
+        "text/csv",
+    )
