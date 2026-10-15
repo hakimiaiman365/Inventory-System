@@ -1,37 +1,56 @@
-P/N,Description,Location,Quantity
-31477,Enh detector,R1-A-1,1
-31459,pcbt-flamingo main board,R1-A-2,1
-31460,main board,R1-A-3,1
-31461,main board,R1-B-1,1
-31462,main board,R1-B-2,1
-31463,main board,R1-B-3,1
-31465,main board,R1-C-1,1
-31466,enh detector harness,R1-C-2,2
-31472,enh detector harness Nir,R1-C-3,2
-31474,single peltier resistor,R1-D-1,10
-31476,common source assy,R1-D-2,7
-31480,Kbr Window-parylene,R1-D-3,10
-31708,pcb flamingo gui display,R2-A-1,4
-31715,Mir Tgs Pre-amp assy,R2-A-2,3
-31719,pcb-flamingo main board,R2-A-3,1
-31722,pcbt flamingo main board,R2-B-1,1
-31724,pcbt flamingo main board,R2-B-2,1
-31726,Hene box-flamingo PSU,R2-B-3,3
-31727,hene bracket-flamingi PSu,R2-C-1,1
-31728,Jstop assy,R2-C-2,2
-31733,turret window,R2-C-3,3
-31734,Display LCD,R2-D-1,3
-31735,turret Moulding,R2-D-2,1
-31736,Turret Window,R2-D-3,3
-31737,Display LCD,R3-A-1,2
-31739,Peripheral drive pcb,R3-A-2,2
-31741,Cable assy-flamingo display,R3-A-3,1
-31748,Enh detector change over,R3-B-1,3
-31749,Output Flat flipper motor,R3-B-2,4
-31752,enh Mfb plugin Pcb,R3-B-3,1
-31756,Enh Mfb plugin pcb,R3-C-1,1
-31757,Jstop assy,R3-C-2,1
-31753,Mct preamp,R3-D-2,1
-31755,Jstop support optica,R3-D-3,1
-31758,enhand mfb pcb,R4-A-1,1
-31762,Det mirror support,R4-A-2,1
+import pandas as pd
+
+# Daftar data baru dari gambar lembar kerja (P/N dan Lokasi Rak)
+data = [
+    ("L1251799", "R1-A-1"), ("L1201613", "R1-A-1"), ("L9003082", "R1-A-1"), ("04991583", "R1-A-1"),[span_6](start_span)[span_6](end_span)
+    ("L1371400", "R1-A-2"), ("L1251792", "R1-A-2"), ("L1252709", "R1-A-2"), ("L1209074", "R1-A-3"),[span_7](start_span)[span_7](end_span)
+    ("L1259234", "R1-A-4"), ("L1259244", "R1-A-5"), ("L1249014", "R1-A-6"), ("L1209114", "R1-A-7"),[span_8](start_span)[span_8](end_span)
+    ("L1205210", "R1-A-8"), ("L1255204", "R1-A-8"), ("L1251718", "R1-B-1"), ("L1379084", "R1-B-1"),[span_9](start_span)[span_9](end_span)
+    ("L1252002", "R1-B-2"), ("L1252002", "R1-B-3"), ("L1370231", "R1-B-4"), ("L1251769", "R1-B-5"),[span_10](start_span)[span_10](end_span)
+    ("L1251795", "R1-B-5"), ("L1861699", "R1-B-6"), ("09911264", "R1-B-6"), ("04974131", "R1-B-6"),[span_11](start_span)[span_11](end_span)
+    ("09919047", "R1-B-6"), ("09971168", "R1-B-6"), ("L1251797", "R1-B-7"), ("L1251794", "R1-B-7"),[span_12](start_span)[span_12](end_span)
+    ("L1251690", "R1-B-8"), ("L1860414", "R1-B-8"), ("L1251692", "R1-B-8"), ("L1251691", "R1-B-8"),[span_13](start_span)[span_13](end_span)
+    ("L1362279", "R1-C-1"), ("09919444", "R1-C-1"), ("L1250455", "R1-C-2"), ("L1250859", "R1-C-2"),[span_14](start_span)[span_14](end_span)[span_15](start_span)[span_15](end_span)
+    ("L1250860", "R1-C-2"), ("L1250817", "R1-C-2"), ("L1251052", "R1-C-2"), ("L1201914", "R1-C-2"),[span_16](start_span)[span_16](end_span)
+    ("L1251051", "R1-C-3"), ("L1251968", "R1-C-4"), ("L1201609", "R1-C-4"), ("L9001194", "R1-C-4"),[span_17](start_span)[span_17](end_span)
+    ("L1251671", "R1-C-5"), ("L1209014", "R1-C-6"), ("L1250816", "R1-C-6"), ("L1252702", "R1-C-7"),[span_18](start_span)[span_18](end_span)
+    ("L1201750", "R1-C-7"), ("L1205739", "R1-C-8"), ("L1371803", "R1-D-1"), ("L1379074", "R1-D-2"),[span_19](start_span)[span_19](end_span)
+    ("L1371807", "R1-D-3"), ("L1371802", "R1-D-3"), ("L1371805", "R1-D-3"), ("L1371801", "R1-D-4"),[span_20](start_span)[span_20](end_span)
+    ("L1371800", "R1-D-4"), ("L1371808", "R1-D-5"), ("09292221", "R1-D-6"), ("L1201837", "R1-E-1"),[span_21](start_span)[span_21](end_span)
+    ("L1201663", "R1-E-1"), ("L1205721", "R1-E-2"), ("L1205204", "R1-E-2"), ("L1242701", "R1-E-3"),[span_22](start_span)[span_22](end_span)
+    ("L1251684", "R1-E-4"), ("L1252600", "R1-E-4"), ("L1251683", "R1-E-4"), ("L1251969", "R1-E-4"),[span_23](start_span)[span_23](end_span)
+    ("04970735", "R1-E-5"), ("09920476", "R1-E-5"), ("09997197", "R1-E-5"), ("L1252601", "R1-E-5"),[span_24](start_span)[span_24](end_span)
+    ("L1251838", "R1-E-5"), ("04970839", "R1-E-6"), ("09997544", "R1-E-6"), ("L1201445", "R1-E-6"),[span_25](start_span)[span_25](end_span)
+    ("L9004569", "R1-E-7"), ("L1255006", "R1-E-8"), ("L1252707", "R1-F-1"), ("L1250370", "R1-F-1"),[span_26](start_span)[span_26](end_span)
+    ("L1250846", "R1-F-2"), ("L1251694", "R1-F-4"), ("L1251681", "R1-F-4"), ("L1251696", "R1-F-4"),[span_27](start_span)[span_27](end_span)
+    ("L1251678", "R1-F-5"), ("L1241001", "R1-F-5"), ("L1251739", "R1-F-5"), ("L1251653", "R1-F-6"),[span_28](start_span)[span_28](end_span)
+    ("L1251432", "R1-F-6"), ("L1391118", "R1-F-6"), ("L1251704", "R1-F-6"), ("09220308", "R1-F-7"),[span_29](start_span)[span_29](end_span)
+    ("L1251449", "R1-F-7"), ("L9003036", "R1-F-8"), ("L1281006", "R1-F-9"), ("L1259334", "R3-A-1"),[span_30](start_span)[span_30](end_span)
+    ("L1259454", "R3-A-2"), ("L1259094", "R3-A-4"), ("L1259184", "R3-A-5"), ("L1201404", "R3-B-1"),[span_31](start_span)[span_31](end_span)
+    ("L1201465", "R3-B-1"), ("09212003", "R3-B-1"), ("L1251779", "R3-B-2"), ("L9001846", "R3-B-2"),[span_32](start_span)[span_32](end_span)
+    ("L9001424", "R3-B-2"), ("L1251455", "R3-B-3"), ("L1251457", "R3-B-3"), ("L1252613", "R3-B-4"),[span_33](start_span)[span_33](end_span)[span_34](start_span)[span_34](end_span)
+    ("L1251776", "R3-B-4"), ("L9002231", "R3-B-4"), ("L1251454", "R3-B-4"), ("L1251807", "R3-B-5"),[span_35](start_span)[span_35](end_span)
+    ("L1371809", "R3-B-5"), ("09902149", "R3-B-5"), ("L1371607", "R3-B-5"), ("L1201825", "R3-B-6"),[span_36](start_span)[span_36](end_span)
+    ("L1201347", "R3-B-7"), ("L1201348", "R3-B-7"), ("00003471", "R3-B-8"), ("04973549", "R3-B-8"),[span_37](start_span)[span_37](end_span)
+    ("04973548", "R3-B-8"), ("L1251433", "R3-B-9"), ("L9003317", "R3-B-9"), ("04972257", "R3-B-10"),[span_38](start_span)[span_38](end_span)
+    ("L1251769", "R3-B-10"), ("L1281013", "R3-B-11"), ("L1281011", "R3-B-11"), ("L1371816", "R3-B-11"),[span_39](start_span)[span_39](end_span)
+    ("L1371815", "R3-B-11"), ("L1371817", "R3-B-11"), ("09926122", "R3-B-12"), ("L1371026", "R3-B-12"),[span_40](start_span)[span_40](end_span)
+    ("L1201726", "R3-B-12"), ("L9004888", "R3-B-13"), ("L1251812", "R3-B-13"), ("09920477", "R3-B-14"),[span_41](start_span)[span_41](end_span)
+    ("L1201464", "R3-B-14"), ("09923434", "R3-B-14"), ("L1181211", "R3-B-14"), ("L1371021", "R3-B-15"),[span_42](start_span)[span_42](end_span)[span_43](start_span)[span_43](end_span)
+    ("L1371020", "R3-B-15"), ("L1371022", "R3-B-15"), ("L1371027", "R3-B-15"), ("L1371023", "R3-B-15"),[span_44](start_span)[span_44](end_span)[span_45](start_span)[span_45](end_span)
+    ("04965243", "R3-C-1"), ("L9004181", "R3-C-1")[span_46](start_span)[span_46](end_span)
+]
+
+# Buat DataFrame dengan kuantiti 100 pcs untuk setiap item
+rows = []
+for pn, loc in data:
+    rows.append({
+        "P/N": pn,
+        "Description": f"Part {pn}",
+        "Location": loc,
+        "Quantity": 100
+    })
+
+df = pd.DataFrame(rows)
+df.to_csv("data.csv", index=False)
+print("File data.csv berhasil diperbarui dengan data baru dan kuantiti 100 pcs!")
